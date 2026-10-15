@@ -24,7 +24,7 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
             lastVideoPTS = .zero
             audioInput = nil
             videoInput = nil
-            writer = nil
+            self.writer = nil
         }
         let content = try await SCShareableContent.current
         let excluded = content.windows.filter { excludingWindowIDs.contains($0.windowID) }
