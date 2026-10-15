@@ -378,11 +378,12 @@ struct WallpaperThumb: View {
         }
         .task(id: url) {
             let u = url
-            image = await Task.detached(priority: .utility) { () -> NSImage? in
+            let cg = await Task.detached(priority: .utility) { () -> CGImage? in
                 guard let src = CGImageSourceCreateWithURL(u as CFURL, nil),
                       let cg = CGImageSourceCreateThumbnailAtIndex(src, 0, [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceThumbnailMaxPixelSize: 360] as CFDictionary) else { return nil }
-                return NSImage(cgImage: cg, size: .zero)
+                return cg
             }.value
+            image = cg.map { NSImage(cgImage: $0, size: .zero) }
         }
     }
 }
