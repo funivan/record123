@@ -1,6 +1,6 @@
 cask "recordy" do
-  version "1.0.0"
-  sha256 :no_check
+  version "0.0.2"
+  sha256 "1d50316eb564e2cf69492d1ab3ab9af2849ac16ac925e8b87bb9cbf0c0a9d8e6"
 
   url "https://github.com/funivan/recordy/releases/download/v#{version}/Recordy-#{version}.zip"
   name "Recordy"
