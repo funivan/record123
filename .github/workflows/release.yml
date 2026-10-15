@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Build
+        env:
+          SIGN_ID: "-"
+          BUILD: ${{ github.run_number }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          git checkout "$GITHUB_REF_NAME"
+          VERSION="$VERSION" ./build.sh --release
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "Recordy-$VERSION.zip" \
+            --title "Recordy $VERSION" --generate-notes
+
+      - name: Update Homebrew cask
+        run: |
+          SHA=$(shasum -a 256 "Recordy-$VERSION.zip" | cut -d' ' -f1)
+          git checkout main
+          sed -i '' -E "s/^  version \".*\"/  version \"$VERSION\"/" Casks/recordy.rb
+          sed -i '' -E "s/^  sha256 .*/  sha256 \"$SHA\"/" Casks/recordy.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update cask to $VERSION"
+          git push origin main

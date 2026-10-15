@@ -1,0 +1,13 @@
+.build/
+.swiftpm/
+.tmp/
+*.app
+*.zip
+*.dmg
+DerivedData/
+xcuserdata/
+.DS_Store
+.idea/
+.vscode/
+.claude/
+skills-lock.json
