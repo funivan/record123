@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b1210"/>
+      <stop offset="1" stop-color="#0d0d14"/>
+    </linearGradient>
+    <radialGradient id="g1" cx="0.15" cy="0.2" r="0.6">
+      <stop offset="0" stop-color="#ff5a36" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ff5a36" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="0.9" cy="0.9" r="0.6">
+      <stop offset="0" stop-color="#d4f542" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#d4f542" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="360" rx="28" fill="url(#bg)"/>
+  <rect width="1280" height="360" rx="28" fill="url(#g1)"/>
+  <rect width="1280" height="360" rx="28" fill="url(#g2)"/>
+  <circle cx="150" cy="180" r="62" fill="#ff5a36"/>
+  <circle cx="150" cy="180" r="24" fill="#fff"/>
+  <g font-family="-apple-system, 'SF Pro Display', Helvetica, Arial, sans-serif">
+    <text x="260" y="190" font-size="92" font-weight="800" fill="#fff">Recordy</text>
+    <text x="264" y="244" font-size="30" fill="#e8e8ee">Record. Polish. Export. All on your Mac.</text>
+    <rect x="264" y="272" width="150" height="40" rx="20" fill="#d4f542"/>
+    <text x="339" y="300" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="middle">Screen</text>
+    <rect x="428" y="272" width="150" height="40" rx="20" fill="#ffffff" fill-opacity="0.14"/>
+    <text x="503" y="300" font-size="20" font-weight="600" fill="#fff" text-anchor="middle">Camera</text>
+    <rect x="592" y="272" width="150" height="40" rx="20" fill="#ffffff" fill-opacity="0.14"/>
+    <text x="667" y="300" font-size="20" font-weight="600" fill="#fff" text-anchor="middle">Zoom</text>
+    <rect x="756" y="272" width="150" height="40" rx="20" fill="#ffffff" fill-opacity="0.14"/>
+    <text x="831" y="300" font-size="20" font-weight="600" fill="#fff" text-anchor="middle">Editor</text>
+  </g>
+</svg>

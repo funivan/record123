@@ -1,18 +1,54 @@
-# Recordy
+<div align="center">
 
-A native macOS screen recorder with a camera overlay, cursor zooms and a built-in editor. Record, polish and export in one app, without a cloud account.
+<img src="docs/assets/banner.svg" alt="Recordy" width="100%">
+
+<br>
+
+[![Release](https://img.shields.io/github/v/release/funivan/recordy?style=for-the-badge&color=ff5a36&label=release)](https://github.com/funivan/recordy/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/funivan/recordy/total?style=for-the-badge&color=d4f542&labelColor=1b1b1b)](https://github.com/funivan/recordy/releases)
+[![macOS](https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&logo=apple&logoColor=white)](#requirements)
+[![Swift](https://img.shields.io/badge/Swift-5.9-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
+[![Homebrew](https://img.shields.io/badge/brew-cask-FBB040?style=for-the-badge&logo=homebrew&logoColor=white)](#homebrew)
+[![Stars](https://img.shields.io/github/stars/funivan/recordy?style=for-the-badge&color=ff5a36)](https://github.com/funivan/recordy/stargazers)
+
+**A native macOS screen recorder with a camera overlay, cursor zooms and a built-in editor.**
+<br>
+Record, polish and export in one app. No cloud account, no subscription, no upload.
+
+[Install](#install) · [Features](#features) · [Hotkeys](#hotkeys) · [Build](#build-from-source) · [Contributing](CONTRIBUTING.md) · [Releasing](docs/RELEASING.md)
+
+</div>
+
+---
+
+## About
+
+Recordy is for demos, tutorials, bug reports and product walkthroughs that should look good without a video editing session. It captures your screen with ScreenCaptureKit, lets you tweak everything afterwards in a timeline editor, and exports a clean MP4 or MOV. Everything stays on your machine.
+
+```mermaid
+flowchart LR
+    A[Record<br/>screen + camera + audio] --> B[Edit<br/>trim, zoom, camera, audio]
+    B --> C[Style<br/>background, layout, aspect]
+    C --> D[Export<br/>MP4 / MOV up to 4K]
+```
 
 ## Features
 
-- **Screen capture**: a full display or a selected area, at 30 or 60 fps (ScreenCaptureKit)
-- **Camera overlay**: circle, rounded square, rectangle or portrait shapes in any corner, with mirroring and background blur
-- **Audio**: microphone and system audio, plus music tracks and voice-overs added in the editor
-- **Zoom**: zoom in on the cursor while recording or add zoom steps afterwards, optionally following the cursor
-- **Editor**: timeline with trim, camera changes over time, audio split and volume, undo/redo
-- **Styling**: wallpapers, gradients, patterns or your own image as the background, with aspect presets (16:9, 4:3, 1:1, 9:16)
-- **Export**: MP4 or MOV at native resolution, 720p, 1080p, 1440p or 4K
-- **Menu bar**: start and stop recording from the menu bar, with global hotkeys
-- **Themes**: System, Signal, Midnight, Tiles and Planet
+- 🖥️ **Screen capture**: a full display or a selected area, at 30 or 60 fps
+- 📷 **Camera overlay**: circle, rounded square, rectangle or portrait, in any corner, with mirroring and background blur
+- 🎙️ **Audio**: microphone and system audio, plus music tracks and voice-overs added in the editor
+- 🔍 **Cursor zoom**: zoom in while recording or add zoom steps afterwards, optionally following the cursor
+- ✂️ **Editor**: timeline with trim, camera changes over time, audio split and volume, undo/redo
+- 🎨 **Styling**: wallpapers, gradients, patterns or your own image, with aspect presets (16:9, 4:3, 1:1, 9:16)
+- 📦 **Export**: MP4 or MOV at native resolution, 720p, 1080p, 1440p or 4K
+- ⌨️ **Menu bar and hotkeys**: start and stop without leaving what you are doing
+- 🌗 **Themes**: System, Signal, Midnight, Tiles and Planet
+
+<div align="center">
+<img src="docs/assets/wallpapers.jpg" alt="Bundled wallpapers" width="100%">
+<br>
+<sub>A few of the bundled wallpapers. Or bring your own image.</sub>
+</div>
 
 Recordings are saved to `~/Movies/Recordy`.
 
@@ -34,7 +70,7 @@ Update with `brew upgrade --cask recordy`.
 
 ### Manual
 
-Download `Recordy-<version>.zip` from [Releases](https://github.com/funivan/recordy/releases), unzip it and move `Recordy.app` to `/Applications`.
+Download `Recordy-<version>.zip` from [Releases](https://github.com/funivan/recordy/releases/latest), unzip it and move `Recordy.app` to `/Applications`.
 
 The app is not notarized, so on first launch macOS may block it. Clear the quarantine flag once:
 
@@ -55,21 +91,28 @@ Grant them in **System Settings → Privacy & Security**, then restart Recordy.
 
 Global hotkeys use `⌃⌥⌘` plus a key:
 
-- `⌃⌥⌘R`: start / stop recording
-- `⌃⌥⌘E`: stop recording and open in the editor
-- `⌃⌥⌘I`: zoom in on the cursor
-- `⌃⌥⌘O`: zoom out
-- `⌃⌥⌘M`: move the camera to the next corner
-- `⌃⌥⌘N`: change the camera shape
-- `⌃⌥⌘H`: show / hide the camera
+| Keys | Action |
+| --- | --- |
+| `⌃⌥⌘R` | Start / stop recording |
+| `⌃⌥⌘E` | Stop recording and open in the editor |
+| `⌃⌥⌘I` | Zoom in on the cursor |
+| `⌃⌥⌘O` | Zoom out |
+| `⌃⌥⌘M` | Move the camera to the next corner |
+| `⌃⌥⌘N` | Change the camera shape |
+| `⌃⌥⌘H` | Show / hide the camera |
 
-In the editor:
+<details>
+<summary>Editor shortcuts</summary>
 
-- `Space`: play / pause
-- `⌘Z` / `⇧⌘Z`: undo / redo
-- `⌘E`: export
-- `⌥⌘I`: toggle the inspector
-- `⌘[`: back to recordings
+| Keys | Action |
+| --- | --- |
+| `Space` | Play / pause |
+| `⌘Z` / `⇧⌘Z` | Undo / redo |
+| `⌘E` | Export |
+| `⌥⌘I` | Toggle the inspector |
+| `⌘[` | Back to recordings |
+
+</details>
 
 ## Build from source
 
@@ -92,36 +135,6 @@ Recordy.app/Contents/MacOS/Recordy --export <project-dir> <output.mp4>
 
 Exports a saved project from `~/Movies/Recordy` without opening the UI.
 
-## Releasing
-
-```sh
-./scripts/release.sh          # list released versions
-./scripts/release.sh 1.0.0    # tag v1.0.0 and push it
-```
-
-The script requires a clean `main` that matches `origin/main`.
-
-The [Release workflow](.github/workflows/release.yml) then:
-
-1. Builds a universal (arm64 + x86_64) app with `./build.sh --release`
-2. Publishes `Recordy-<version>.zip` as a GitHub release
-3. Updates the version and checksum in [`Casks/recordy.rb`](Casks/recordy.rb) on `main`
-
-```mermaid
-flowchart LR
-    tag[scripts/release.sh X.Y.Z] --> ci[GitHub Actions]
-    ci --> build[build.sh --release]
-    build --> rel[GitHub release zip]
-    rel --> cask[Casks/recordy.rb updated]
-    cask --> brew[brew upgrade --cask recordy]
-```
-
-For a signed and notarized build, run it locally with a Developer ID certificate:
-
-```sh
-NOTARY_PROFILE=<profile> VERSION=1.0.0 ./build.sh --release
-```
-
 ## Project layout
 
 - `Sources/Recordy`: SwiftUI app (capture, editor, renderer, exporter)
@@ -130,3 +143,12 @@ NOTARY_PROFILE=<profile> VERSION=1.0.0 ./build.sh --release
 - `Casks`: Homebrew cask
 - `build.sh`: builds, signs and packages the app
 - `scripts/release.sh`: tags and pushes a release
+
+## Contributing and releasing
+
+- [CONTRIBUTING.md](CONTRIBUTING.md): set up, build and send changes
+- [docs/RELEASING.md](docs/RELEASING.md): how a version gets from a tag to `brew upgrade`
+
+<div align="center">
+<sub>Made with SwiftUI and ScreenCaptureKit.</sub>
+</div>
