@@ -94,12 +94,12 @@ Exports a saved project from `~/Movies/Recordy` without opening the UI.
 
 ## Releasing
 
-Push a version tag:
-
 ```sh
-git tag v1.0.0
-git push origin v1.0.0
+./scripts/release.sh          # list released versions
+./scripts/release.sh 1.0.0    # tag v1.0.0 and push it
 ```
+
+The script requires a clean `main` that matches `origin/main`.
 
 The [Release workflow](.github/workflows/release.yml) then:
 
@@ -109,7 +109,7 @@ The [Release workflow](.github/workflows/release.yml) then:
 
 ```mermaid
 flowchart LR
-    tag[git tag vX.Y.Z] --> ci[GitHub Actions]
+    tag[scripts/release.sh X.Y.Z] --> ci[GitHub Actions]
     ci --> build[build.sh --release]
     build --> rel[GitHub release zip]
     rel --> cask[Casks/recordy.rb updated]
@@ -129,3 +129,4 @@ NOTARY_PROFILE=<profile> VERSION=1.0.0 ./build.sh --release
 - `tools`: scripts that generate the icon and wallpapers
 - `Casks`: Homebrew cask
 - `build.sh`: builds, signs and packages the app
+- `scripts/release.sh`: tags and pushes a release
