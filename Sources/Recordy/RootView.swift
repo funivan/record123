@@ -8,14 +8,14 @@ struct RootView: View {
     @ObservedObject private var themes = ThemeStore.shared
 
     var body: some View {
-        ZStack {
-            AppBackground()
+        Group {
             if let editor = state.editor {
                 EditorView(model: editor)
             } else {
                 HomeView()
             }
         }
+        .background { AppBackground().allowsHitTesting(false) }
         .alert("Recordy", isPresented: Binding(get: { state.error != nil }, set: { if !$0 { state.error = nil } })) {
             Button("OK") { state.error = nil }
         } message: { Text(state.error ?? "") }
