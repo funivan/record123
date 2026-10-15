@@ -10,7 +10,7 @@ A native macOS screen recorder with a camera overlay, cursor zooms and a built-i
 - **Zoom**: zoom in on the cursor while recording or add zoom steps afterwards, optionally following the cursor
 - **Editor**: timeline with trim, camera changes over time, audio split and volume, undo/redo
 - **Styling**: wallpapers, gradients, patterns or your own image as the background, with aspect presets (16:9, 4:3, 1:1, 9:16)
-- **Export**: MP4 at native resolution, 720p, 1080p, 1440p or 4K
+- **Export**: MP4 or MOV at native resolution, 720p, 1080p, 1440p or 4K
 - **Menu bar**: start and stop recording from the menu bar, with global hotkeys
 - **Themes**: System, Signal, Midnight, Tiles and Planet
 
