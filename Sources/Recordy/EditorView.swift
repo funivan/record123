@@ -23,26 +23,18 @@ struct EditorView: View {
     @EnvironmentObject var app: AppState
     @ObservedObject var model: EditorModel
     @State private var showInspector = true
+    @AppStorage("inspector.width") private var inspectorWidth = 340.0
+    @State private var dragStartWidth: Double?
 
     var body: some View {
-        VStack(spacing: 0) {
-            PlayerView(player: model.player)
-                .aspectRatio(outputSize(for: model.project).width / outputSize(for: model.project).height, contentMode: .fit)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .padding(.horizontal, 14)
-                .overlay { if model.project.cameraFile != nil { CameraDragLayer(model: model) } }
-                .overlay { if model.pickingFocus && model.selectedZoom != nil { FocusPickerLayer(model: model) } }
-                .padding(.top, 8)
-            transport
-            TimelineView(model: model)
-                .frame(height: TimelineView.height(for: model.project))
-                .padding(.horizontal, 14)
-                .padding(.bottom, 12)
-        }
-        .inspector(isPresented: $showInspector) {
-            InspectorView(model: model)
-                .inspectorColumnWidth(min: 300, ideal: 340, max: 440)
+        HStack(spacing: 0) {
+            editorColumn
+            if showInspector {
+                Divider()
+                InspectorView(model: model)
+                    .frame(width: inspectorWidth)
+                    .overlay(alignment: .leading) { inspectorResizeHandle }
+            }
         }
         .navigationTitle(model.project.name)
         .toolbar {
@@ -61,6 +53,35 @@ struct EditorView: View {
         .alert("Recordy", isPresented: Binding(get: { model.loadError != nil }, set: { if !$0 { model.loadError = nil } })) {
             Button("OK") { model.loadError = nil }
         } message: { Text(model.loadError ?? "") }
+    }
+
+    private var inspectorResizeHandle: some View {
+        Color.clear
+            .frame(width: 6)
+            .contentShape(Rectangle())
+            .onHover { if $0 { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() } }
+            .gesture(DragGesture(minimumDistance: 1, coordinateSpace: .global).onChanged { v in
+                if dragStartWidth == nil { dragStartWidth = inspectorWidth }
+                inspectorWidth = min(440, max(300, (dragStartWidth ?? inspectorWidth) - v.translation.width))
+            }.onEnded { _ in dragStartWidth = nil })
+    }
+
+    private var editorColumn: some View {
+        VStack(spacing: 0) {
+            PlayerView(player: model.player)
+                .aspectRatio(outputSize(for: model.project).width / outputSize(for: model.project).height, contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .padding(.horizontal, 14)
+                .overlay { if model.project.cameraFile != nil { CameraDragLayer(model: model) } }
+                .overlay { if model.pickingFocus && model.selectedZoom != nil { FocusPickerLayer(model: model) } }
+                .padding(.top, 8)
+            transport
+            TimelineView(model: model)
+                .frame(height: TimelineView.height(for: model.project))
+                .padding(.horizontal, 14)
+                .padding(.bottom, 12)
+        }
     }
 
     var transport: some View {
