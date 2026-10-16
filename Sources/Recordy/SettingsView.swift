@@ -88,6 +88,7 @@ struct RecordingSettings: View {
     @AppStorage("countdown") private var countdown = 3
     @AppStorage("fps") private var fps = 60
     @AppStorage("showCursor") private var showCursor = true
+    @State private var confirmReset = false
 
     var body: some View {
         Form {
@@ -99,8 +100,17 @@ struct RecordingSettings: View {
             }
             Toggle("Capture mouse cursor", isOn: $showCursor)
             Text("Recordings are saved to ~/Movies/Recordy.").font(.caption).foregroundStyle(.secondary)
+            Section("Permissions") {
+                Button("Reset permissions…") { confirmReset = true }
+                Text("Clears Screen Recording, Microphone and Camera access for Recordy and restarts the app. Use it if access is enabled but Recordy still says it is missing.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
+        .confirmationDialog("Reset all Recordy permissions?", isPresented: $confirmReset) {
+            Button("Reset and restart", role: .destructive) { PermissionsModel.resetAndRelaunch() }
+            Button("Cancel", role: .cancel) {}
+        }
     }
 }
 

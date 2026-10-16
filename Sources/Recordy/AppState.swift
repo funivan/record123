@@ -108,6 +108,7 @@ final class AppState: ObservableObject {
         mics = Devices.microphones()
         if !selectedCamera.isEmpty, !cameras.contains(where: { $0.uniqueID == selectedCamera }) { selectedCamera = "" }
         if !selectedMic.isEmpty, !mics.contains(where: { $0.uniqueID == selectedMic }) { selectedMic = "" }
+        guard CGPreflightScreenCaptureAccess() else { return }
         Task {
             if let c = try? await SCShareableContent.current {
                 displays = c.displays

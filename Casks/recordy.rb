@@ -20,11 +20,11 @@ cask "recordy" do
     run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{appdir}}/Recordy.app"]
   end
 
-  uninstall quit: "com.recordy.app"
+  uninstall quit: "com.funivan.recordy"
 
   zap trash: [
     "~/Library/Application Support/Recordy",
-    "~/Library/Preferences/com.recordy.app.plist",
-    "~/Library/Saved Application State/com.recordy.app.savedState",
+    "~/Library/Preferences/com.funivan.recordy.plist",
+    "~/Library/Saved Application State/com.funivan.recordy.savedState",
   ]
 end

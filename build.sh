@@ -44,7 +44,7 @@ cat > $APP/Contents/Info.plist <<PLIST
 <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
 <key>CFBundleDevelopmentRegion</key><string>en</string>
 <key>CFBundleExecutable</key><string>Recordy</string>
-<key>CFBundleIdentifier</key><string>com.recordy.app</string>
+<key>CFBundleIdentifier</key><string>com.funivan.recordy</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
 <key>CFBundleName</key><string>Recordy</string>
 <key>CFBundleDisplayName</key><string>Recordy</string>
@@ -53,7 +53,7 @@ cat > $APP/Contents/Info.plist <<PLIST
 <key>CFBundleVersion</key><string>$BUILD</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>LSApplicationCategoryType</key><string>public.app-category.video</string>
-<key>NSHumanReadableCopyright</key><string>© $(date +%Y) Recordy</string>
+<key>NSHumanReadableCopyright</key><string>© $(date +%Y) Ivan Shcherbak (funivan)</string>
 <key>NSHighResolutionCapable</key><true/>
 <key>NSSupportsAutomaticTermination</key><false/>
 <key>NSSupportsSuddenTermination</key><false/>

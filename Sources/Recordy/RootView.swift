@@ -50,6 +50,7 @@ enum RecorderPanel: String, OrderedPanel {
 
 struct HomeView: View {
     @EnvironmentObject var state: AppState
+    @StateObject private var perms = PermissionsModel()
     @AppStorage(PanelOrder.recorderKey) private var recorderOrder = ""
 
     var body: some View {
@@ -90,7 +91,7 @@ struct HomeView: View {
                             Label(buttonTitle, systemImage: "record.circle.fill").frame(maxWidth: .infinity)
                         }
                         .buttonStyle(GradientButtonStyle(gradient: Theme.record))
-                        .disabled(state.phase == .saving || state.phase == .recording)
+                        .disabled(state.phase == .saving || state.phase == .recording || !perms.screenOK)
                     } }
                     if state.testing {
                         Text(state.selectedCamera.isEmpty ? "Speak to see the level on your screen." : "Camera and mic level are shown on your screen at the chosen corner.")
@@ -100,12 +101,16 @@ struct HomeView: View {
                 .padding(24)
             }
             .frame(width: 400)
+            .onChange(of: perms.screenOK) { _, ok in if ok { state.refreshDevices() } }
             .onChange(of: state.startCorner) { _, _ in state.applyTestLayout() }
             .onChange(of: state.startShape) { _, _ in state.applyTestLayout() }
 
             Rectangle().fill(Theme.bone.opacity(0.08)).frame(width: 1)
 
             VStack(alignment: .leading, spacing: 12) {
+                if !perms.allOK && !(perms.screenOK && perms.skipped) {
+                    PermissionsSetupView(model: perms)
+                } else {
                 Text("Recordings").font(Theme.serif(24, italic: true))
                 if state.projects.isEmpty {
                     VStack(spacing: 8) {
@@ -122,6 +127,8 @@ struct HomeView: View {
                     }
                 }
                 HotkeysPanel()
+                PermissionsStatusBar(model: perms)
+                }
             }
             .padding(24)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
