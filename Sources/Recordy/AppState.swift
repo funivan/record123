@@ -42,7 +42,7 @@ final class AppState: ObservableObject {
     @Published var startShape = CameraShape.circle
     @Published var projects: [ProjectRef] = []
     var draggingRecording: ProjectRef?
-    @Published var editor: EditorModel?
+    @Published var editor: EditorModel? { didSet { syncRegionFrame() } }
     private var openCancellable: AnyCancellable?
     @Published var error: String?
     @Published var elapsed = 0.0
@@ -98,6 +98,13 @@ final class AppState: ObservableObject {
             }
         }
         Task { await recoverProjects() }
+        for name in [NSWindow.willCloseNotification, NSWindow.didMiniaturizeNotification, NSWindow.didDeminiaturizeNotification,
+                     NSWindow.didBecomeKeyNotification, NSWindow.didChangeOcclusionStateNotification] {
+            NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] n in
+                guard let w = n.object as? NSWindow, !(w is NSPanel) else { return }
+                DispatchQueue.main.async { MainActor.assumeIsolated { self?.syncRegionFrame() } }
+            }
+        }
         syncRegionFrame()
     }
 
@@ -122,8 +129,18 @@ final class AppState: ObservableObject {
         return region.rect
     }
 
+    nonisolated static func shouldShowRegionFrame(phase: RecPhase, editorOpen: Bool, mainWindowVisible: Bool, hasActiveRegion: Bool) -> Bool {
+        phase == .idle && !editorOpen && mainWindowVisible && hasActiveRegion
+    }
+
+    private var mainWindowVisible: Bool {
+        NSApp.windows.contains { !($0 is NSPanel) && $0.canBecomeMain && $0.isVisible && !$0.isMiniaturized }
+    }
+
     private func syncRegionFrame() {
-        guard phase == .idle, let rect = activeRegion(for: selectedDisplay), let screen = nsScreen(selectedDisplay) else {
+        let rect = activeRegion(for: selectedDisplay)
+        guard Self.shouldShowRegionFrame(phase: phase, editorOpen: editor != nil || openCancellable != nil, mainWindowVisible: mainWindowVisible, hasActiveRegion: rect != nil),
+              let rect, let screen = nsScreen(selectedDisplay) else {
             regionFrame.hide()
             return
         }
@@ -439,6 +456,7 @@ final class AppState: ObservableObject {
         }
         if wins.isEmpty { NSWorkspace.shared.open(Bundle.main.bundleURL) }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { NSApp.activate(ignoringOtherApps: true) }
+        syncRegionFrame()
     }
 
     func open(_ dir: URL) {
@@ -446,7 +464,11 @@ final class AppState: ObservableObject {
         editor?.player.pause()
         let m = EditorModel(project: p, dir: dir)
         m.onSaved = { [weak self] in self?.projects = ProjectRef.loadAll() }
-        openCancellable = m.$ready.filter { $0 }.first().sink { [weak self] _ in self?.editor = m }
+        openCancellable = m.$ready.filter { $0 }.first().sink { [weak self] _ in
+            self?.editor = m
+            self?.openCancellable = nil
+        }
+        syncRegionFrame()
     }
 
     func closeEditor() {

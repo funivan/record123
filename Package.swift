@@ -8,6 +8,7 @@ let package = Package(
         .executableTarget(
             name: "Recordy",
             path: "Sources/Recordy"
-        )
+        ),
+        .testTarget(name: "RecordyTests", dependencies: ["Recordy"], path: "Tests/RecordyTests")
     ]
 )
