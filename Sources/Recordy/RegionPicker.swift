@@ -8,6 +8,7 @@ struct CaptureRegion: Codable, Equatable {
 @MainActor
 final class RegionPicker {
     private static var active: RegionPicker?
+    nonisolated static let minSelectionSize: CGFloat = 64
     private var panel: NSPanel?
     private var done: ((CGRect?) -> Void)?
 
@@ -38,6 +39,11 @@ final class RegionPicker {
         NSApp.activate(ignoringOtherApps: true)
         p.makeKeyAndOrderFront(nil)
         p.makeFirstResponder(v)
+    }
+
+    nonisolated static func isValidSelection(_ rect: CGRect?) -> Bool {
+        guard let rect else { return false }
+        return rect.width >= minSelectionSize && rect.height >= minSelectionSize
     }
 
     private func finish(_ rect: CGRect?) {
@@ -102,7 +108,7 @@ private enum Drag {
     case resize(Edges, start: CGRect)
 }
 
-private final class SelectionView: NSView {
+final class SelectionView: NSView {
     var selection: CGRect? {
         didSet {
             needsDisplay = true
@@ -111,7 +117,7 @@ private final class SelectionView: NSView {
     }
     var onFinish: ((CGRect?) -> Void)?
     private var drag: Drag?
-    private let minSize: CGFloat = 64
+    private var didDrag = false
     private let grabZone: CGFloat = 10
 
     override var isFlipped: Bool { true }
@@ -130,6 +136,7 @@ private final class SelectionView: NSView {
 
     override func mouseDown(with event: NSEvent) {
         let p = clamp(convert(event.locationInWindow, from: nil))
+        didDrag = false
         if let s = selection, let edges = grab(at: p, in: s) {
             drag = edges.isEmpty
                 ? .move(grab: CGPoint(x: p.x - s.minX, y: p.y - s.minY), start: s)
@@ -142,6 +149,7 @@ private final class SelectionView: NSView {
 
     override func mouseDragged(with event: NSEvent) {
         guard let drag else { return }
+        didDrag = true
         let p = clamp(convert(event.locationInWindow, from: nil))
         switch drag {
         case .create(let anchor):
@@ -162,14 +170,14 @@ private final class SelectionView: NSView {
 
     override func mouseUp(with event: NSEvent) {
         drag = nil
+        guard didDrag, isValid(selection) else { return }
+        didDrag = false
+        onFinish?(selection?.integral)
     }
 
     override func keyDown(with event: NSEvent) {
         switch event.keyCode {
         case 53: onFinish?(nil)
-        case 36, 76:
-            guard isValid(selection) else { return }
-            onFinish?(selection?.integral)
         default: super.keyDown(with: event)
         }
     }
@@ -182,7 +190,7 @@ private final class SelectionView: NSView {
             dim.windingRule = .evenOdd
         }
         dim.fill()
-        drawLabel("Drag to select · drag edges to resize · Enter to use · Esc to cancel", at: CGPoint(x: bounds.midX, y: 40), centered: true)
+        drawLabel("Drag to select an area", at: CGPoint(x: bounds.midX, y: 40), centered: true)
         guard let s = selection, s.width > 0, s.height > 0 else { return }
         let border = NSBezierPath(rect: s.insetBy(dx: 1, dy: 1))
         border.lineWidth = 2
@@ -191,7 +199,7 @@ private final class SelectionView: NSView {
         if isValid(s) {
             drawLabel("\(Int(s.width)) × \(Int(s.height))", at: CGPoint(x: s.minX, y: max(s.minY - 34, 4)), centered: false)
         } else {
-            drawLabel("Too small (min \(Int(minSize)) × \(Int(minSize)))", at: CGPoint(x: s.minX, y: max(s.minY - 34, 4)), centered: false)
+            drawLabel("Too small (min \(Int(RegionPicker.minSelectionSize)) × \(Int(RegionPicker.minSelectionSize)))", at: CGPoint(x: s.minX, y: max(s.minY - 34, 4)), centered: false)
         }
     }
 
@@ -205,8 +213,7 @@ private final class SelectionView: NSView {
     }
 
     private func isValid(_ r: CGRect?) -> Bool {
-        guard let r else { return false }
-        return r.width >= minSize && r.height >= minSize
+        RegionPicker.isValidSelection(r)
     }
 
     private func clamp(_ p: CGPoint) -> CGPoint {
