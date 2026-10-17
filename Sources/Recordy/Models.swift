@@ -74,29 +74,6 @@ struct RGBA: Codable, Equatable {
     }
 }
 
-enum AspectChoice: String, Codable, CaseIterable, Identifiable {
-    case original, wide16x9, standard4x3, square, vertical9x16
-    var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .original: return "Original"
-        case .wide16x9: return "16:9"
-        case .standard4x3: return "4:3"
-        case .square: return "1:1"
-        case .vertical9x16: return "9:16"
-        }
-    }
-    func ratio(original: Double) -> Double {
-        switch self {
-        case .original: return original
-        case .wide16x9: return 16.0 / 9.0
-        case .standard4x3: return 4.0 / 3.0
-        case .square: return 1
-        case .vertical9x16: return 9.0 / 16.0
-        }
-    }
-}
-
 enum BgPattern: String, Codable, CaseIterable, Identifiable {
     case none, dots, grid, lines, grain
     var id: String { rawValue }
@@ -119,7 +96,6 @@ struct Style: Codable, Equatable {
     var padding = 0.07
     var cornerRadius = 0.025
     var shadow = 0.55
-    var aspect = AspectChoice.original
     var resolution = 0
     var cameraSize = 0.24
     var cameraBorder = 4.0
@@ -146,7 +122,6 @@ struct Style: Codable, Equatable {
         padding = c.opt(.padding, padding)
         cornerRadius = c.opt(.cornerRadius, cornerRadius)
         shadow = c.opt(.shadow, shadow)
-        aspect = c.opt(.aspect, aspect)
         resolution = c.opt(.resolution, resolution)
         cameraSize = c.opt(.cameraSize, cameraSize)
         cameraBorder = c.opt(.cameraBorder, cameraBorder)
@@ -301,6 +276,65 @@ struct AudioClip: Codable, Identifiable, Equatable {
     var title: String { name ?? kind.label }
 }
 
+enum CropHandle: String, CaseIterable {
+    case topLeft, top, topRight, right, bottomRight, bottom, bottomLeft, left, move
+
+    static let resizing = allCases.filter { $0 != .move }
+
+    var movesLeft: Bool { self == .left || self == .topLeft || self == .bottomLeft }
+    var movesRight: Bool { self == .right || self == .topRight || self == .bottomRight }
+    var movesTop: Bool { self == .top || self == .topLeft || self == .topRight }
+    var movesBottom: Bool { self == .bottom || self == .bottomLeft || self == .bottomRight }
+
+    func anchor(in r: CGRect) -> CGPoint {
+        switch self {
+        case .topLeft: return CGPoint(x: r.minX, y: r.minY)
+        case .top: return CGPoint(x: r.midX, y: r.minY)
+        case .topRight: return CGPoint(x: r.maxX, y: r.minY)
+        case .right: return CGPoint(x: r.maxX, y: r.midY)
+        case .bottomRight: return CGPoint(x: r.maxX, y: r.maxY)
+        case .bottom: return CGPoint(x: r.midX, y: r.maxY)
+        case .bottomLeft: return CGPoint(x: r.minX, y: r.maxY)
+        case .left: return CGPoint(x: r.minX, y: r.midY)
+        case .move: return CGPoint(x: r.midX, y: r.midY)
+        }
+    }
+}
+
+struct CropRect: Codable, Equatable {
+    var x: Double, y: Double, w: Double, h: Double
+
+    static let full = CropRect(x: 0, y: 0, w: 1, h: 1)
+
+    func isFull(tolerance: Double = 0.001) -> Bool {
+        abs(x) <= tolerance && abs(y) <= tolerance && abs(w - 1) <= tolerance && abs(h - 1) <= tolerance
+    }
+
+    func clamped() -> CropRect {
+        let cx = min(max(x, 0), 1), cy = min(max(y, 0), 1)
+        let cw = min(max(w, 0), 1 - cx), ch = min(max(h, 0), 1 - cy)
+        guard cw > 0.0001, ch > 0.0001 else { return .full }
+        return CropRect(x: cx, y: cy, w: cw, h: ch)
+    }
+
+    static func dragged(_ base: CropRect, handle: CropHandle, by delta: CGPoint, minSize: CGSize) -> CropRect {
+        var l = base.x, t = base.y, r = base.x + base.w, b = base.y + base.h
+        let minW = min(max(Double(minSize.width), 0), 1), minH = min(max(Double(minSize.height), 0), 1)
+        let dx = Double(delta.x), dy = Double(delta.y)
+        func clamp(_ v: Double, _ lo: Double, _ hi: Double) -> Double { min(max(v, lo), hi) }
+        switch handle {
+        case .move:
+            return CropRect(x: clamp(base.x + dx, 0, max(1 - base.w, 0)), y: clamp(base.y + dy, 0, max(1 - base.h, 0)), w: base.w, h: base.h)
+        default:
+            if handle.movesLeft { l = clamp(l + dx, 0, max(r - minW, 0)) }
+            if handle.movesRight { r = clamp(r + dx, min(l + minW, 1), 1) }
+            if handle.movesTop { t = clamp(t + dy, 0, max(b - minH, 0)) }
+            if handle.movesBottom { b = clamp(b + dy, min(t + minH, 1), 1) }
+        }
+        return CropRect(x: l, y: t, w: r - l, h: b - t)
+    }
+}
+
 struct CursorSample: Codable {
     var t: Double
     var x: Double
@@ -329,6 +363,7 @@ struct Project: Codable, Identifiable {
     var trimStart = 0.0
     var trimEnd = 0.0
     var incomplete: Bool?
+    var crop: CropRect?
 
     mutating func migrateZoom() {
         guard zoomSegments == nil else { return }
@@ -339,6 +374,17 @@ struct Project: Codable, Identifiable {
     var segments: [ZoomSegment] { zoomSegments ?? [] }
 
     var sourceSize: CGSize { CGSize(width: screenWidth, height: screenHeight) }
+
+    var cropRect: CropRect { (crop ?? .full).clamped() }
+
+    var croppedSize: CGSize {
+        let c = cropRect
+        return CGSize(width: c.w * Double(screenWidth), height: c.h * Double(screenHeight))
+    }
+
+    var minCropSize: CGSize {
+        CGSize(width: min(64 / Double(max(screenWidth, 1)), 1), height: min(64 / Double(max(screenHeight, 1)), 1))
+    }
 
     var trimmedDuration: Double { max(0.1, trimEnd - trimStart) }
 }

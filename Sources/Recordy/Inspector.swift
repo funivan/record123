@@ -98,12 +98,19 @@ struct InspectorView: View {
     var layout: some View {
         Section_(title: "Layout", icon: "rectangle.inset.filled", expanded: true) {
             HStack {
-                Button { model.applyFullScreen() } label: { Label("Full screen", systemImage: "rectangle.dashed") }
-                Button { model.applyFramed() } label: { Label("Framed", systemImage: "rectangle.inset.filled") }
+                Button { model.beginCrop() } label: { Label("Crop", systemImage: "crop") }
+                    .accessibilityIdentifier("layout.crop")
+                if model.project.crop != nil {
+                    Button { model.resetCrop() } label: { Label("Reset crop", systemImage: "arrow.uturn.backward") }
+                        .accessibilityIdentifier("layout.resetCrop")
+                }
             }
             .buttonStyle(SoftButtonStyle())
-            Picker("Aspect", selection: style.aspect) {
-                ForEach(AspectChoice.allCases) { Text($0.label).tag($0) }
+            if model.project.crop != nil {
+                let size = model.project.croppedSize
+                Text("\(Int(size.width.rounded())) × \(Int(size.height.rounded()))")
+                    .font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                    .accessibilityIdentifier("layout.cropSize")
             }
             Picker("Resolution", selection: style.resolution) {
                 Text("Native").tag(0)

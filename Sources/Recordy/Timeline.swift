@@ -40,7 +40,9 @@ struct Timeline {
     let style: Style
 
     init(project: Project) {
-        self.init(segments: project.segments, cameraKeys: project.cameraKeys, cursor: project.cursor, style: project.style)
+        let c = project.cropRect
+        let cursor = project.cursor.map { CursorSample(t: $0.t, x: ($0.x - c.x) / c.w, y: ($0.y - c.y) / c.h) }
+        self.init(segments: project.segments, cameraKeys: project.cameraKeys, cursor: cursor, style: project.style)
     }
 
     init(segments: [ZoomSegment], cameraKeys: [CameraKey], cursor: [CursorSample], style: Style) {

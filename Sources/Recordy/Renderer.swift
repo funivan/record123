@@ -33,14 +33,13 @@ final class RenderState {
 }
 
 func outputSize(for p: Project) -> CGSize {
-    let src = p.sourceSize
-    let original = Double(src.width) / Double(max(src.height, 1))
-    let ratio = p.style.aspect.ratio(original: original)
+    let src = p.croppedSize
+    let ratio = Double(src.width) / Double(max(src.height, 1))
     let short = p.style.resolution > 0 ? Double(p.style.resolution) : Double(min(src.width, src.height))
     var w: Double, h: Double
     if ratio >= 1 { h = short; w = short * ratio } else { w = short; h = short / ratio }
-    w = (w / 2).rounded() * 2
-    h = (h / 2).rounded() * 2
+    w = max((w / 2).rounded() * 2, 2)
+    h = max((h / 2).rounded() * 2, 2)
     return CGSize(width: w, height: h)
 }
 
@@ -220,12 +219,21 @@ final class Compositor: NSObject, AVVideoCompositing {
     static func contentRect(project: Project, out: CGSize) -> CGRect {
         let pad = project.style.padding * min(out.width, out.height)
         let avail = CGSize(width: out.width - 2 * pad, height: out.height - 2 * pad)
-        let src = project.sourceSize
+        let src = project.croppedSize
         let ar = Double(src.width) / Double(max(src.height, 1))
         var w = avail.width, h = w / ar
         if h > avail.height { h = avail.height; w = h * ar }
         w = w.rounded(); h = h.rounded()
         return CGRect(x: ((out.width - w) / 2).rounded(), y: ((out.height - h) / 2).rounded(), width: w, height: h)
+    }
+
+    static func sourceRect(crop: CropRect, zoomScale: Double, zoomCenter: CGPoint, frame: CGSize) -> CGRect {
+        let cx = crop.x * frame.width, cy = crop.y * frame.height
+        let cw = crop.w * frame.width, ch = crop.h * frame.height
+        let vw = cw / zoomScale, vh = ch / zoomScale
+        let x0 = min(max(cx + zoomCenter.x * cw - vw / 2, cx), cx + cw - vw)
+        let y0 = min(max(cy + zoomCenter.y * ch - vh / 2, cy), cy + ch - vh)
+        return CGRect(x: x0, y: y0, width: vw, height: vh)
     }
 
     private func buildUnderlay(project: Project, dir: URL, out: CGSize, rect: CGRect) -> CIImage {
@@ -291,10 +299,9 @@ final class Compositor: NSObject, AVVideoCompositing {
             let full = CIImage(cvPixelBuffer: screen)
             let sw = full.extent.width, sh = full.extent.height
             let z = timeline.zoomState(at: t)
-            let vw = sw / z.scale, vh = sh / z.scale
-            let x0 = min(max(z.center.x * sw - vw / 2, 0), sw - vw)
-            let yTop = min(max(z.center.y * sh - vh / 2, 0), sh - vh)
-            let crop = CGRect(x: x0, y: sh - yTop - vh, width: vw, height: vh)
+            let view = Compositor.sourceRect(crop: project.cropRect, zoomScale: z.scale, zoomCenter: z.center, frame: CGSize(width: sw, height: sh))
+            let vw = view.width, vh = view.height
+            let crop = CGRect(x: view.minX, y: sh - view.minY - vh, width: vw, height: vh)
             let screenRect = rect
             let sx = screenRect.width / vw, sy = screenRect.height / vh
             let tf = CGAffineTransform(translationX: -crop.minX, y: -crop.minY)
