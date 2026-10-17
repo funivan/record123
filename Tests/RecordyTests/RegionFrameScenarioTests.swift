@@ -1,28 +1,48 @@
 import Testing
 @testable import Recordy
 
+// Feature: The area frame shows only on the home screen
+//   Rule: The frame is shown only on the home screen with an active area
+//   Background: see SelectionPickerTests
 struct RegionFrameScenarioTests {
     private func shown(_ phase: RecPhase = .idle, editor: Bool = false, window: Bool = true, region: Bool = true) -> Bool {
         AppState.shouldShowRegionFrame(phase: phase, editorOpen: editor, mainWindowVisible: window, hasActiveRegion: region)
     }
 
-    @Test("Given the home screen, an active area and idle recording, then the frame is shown")
+    // Scenario: The frame is shown on the home screen
+    //   Given an area is active
+    //   When the main window shows the home screen
+    //   Then the area frame is on screen
+    @Test("The frame is shown on the home screen")
     func homeShowsFrame() {
         #expect(shown())
     }
 
-    @Test("Given an open or loading editor, then the frame is hidden")
+    // Scenario: The frame is hidden in the editor
+    //   Given an area is active
+    //   When the editor is open or loading
+    //   Then the area frame is not on screen
+    @Test("The frame is hidden in the editor")
     func editorHidesFrame() {
         #expect(!shown(editor: true))
     }
 
-    @Test("Given the user returns from the editor to the home screen, then the frame is shown again")
+    // Scenario: The frame returns after Back to Recordings
+    //   Given an area is active
+    //   And the user is in the editor
+    //   When the user clicks Back to Recordings
+    //   Then the area frame is on screen
+    @Test("The frame returns after Back to Recordings")
     func backShowsFrame() {
         #expect(!shown(editor: true))
         #expect(shown(editor: false))
     }
 
-    @Test("Given a countdown, a recording or saving, then the frame is hidden")
+    // Scenario: The frame is hidden during the countdown, recording and saving
+    //   Given an area is active
+    //   When the countdown, a recording or saving is in progress
+    //   Then the area frame is not on screen
+    @Test("The frame is hidden during the countdown, recording and saving")
     func busyHidesFrame() {
         #expect(!shown(.countdown(3)))
         #expect(!shown(.countdown(1)))
@@ -30,21 +50,47 @@ struct RegionFrameScenarioTests {
         #expect(!shown(.saving))
     }
 
-    @Test("Given the main window is closed or minimised, then the frame is hidden, and restoring it shows the frame again")
+    // Scenario: The frame follows the main window visibility
+    //   Given an area is active
+    //   When the main window is closed or minimised
+    //   Then the area frame is not on screen
+    //   But it is on screen again once the window is back
+    @Test("The frame follows the main window visibility")
     func windowHidesFrame() {
         #expect(!shown(window: false))
         #expect(shown(window: true))
     }
 
-    @Test("Given no active area, then the frame is hidden")
+    // Scenario: The frame is hidden while no area is active
+    //   Given no area is active
+    //   When the main window shows the home screen
+    //   Then the area frame is not on screen
+    @Test("The frame is hidden while no area is active")
     func noRegionHidesFrame() {
         #expect(!shown(region: false))
     }
 
-    @Test("Given a recording just stopped and the project is loading, then the frame stays hidden")
+    // Scenario: The frame stays hidden while the editor loads after a recording
+    //   Given an area is active
+    //   When a recording has stopped and the editor is still loading
+    //   Then the area frame is not on screen
+    @Test("The frame stays hidden while the editor loads after a recording")
     func stopThenLoadingStaysHidden() {
         #expect(!shown(.recording))
         #expect(!shown(.saving))
         #expect(!shown(.idle, editor: true))
     }
+
+    // @ui
+    // Scenario: The frame is hidden when the main window is closed or minimised
+    //   Given an area is active
+    //   When the user closes or minimises the main window
+    //   Then the area frame is not on screen
+    //
+    // @ui
+    // Scenario: The frame returns after the window is restored
+    //   Given an area is active
+    //   And the main window was closed or minimised
+    //   When the user brings the main window back
+    //   Then the area frame is on screen
 }

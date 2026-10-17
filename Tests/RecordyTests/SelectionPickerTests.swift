@@ -3,6 +3,17 @@ import AppKit
 @testable import Recordy
 
 @MainActor
+// Feature: Selected area is applied as soon as it is drawn
+//   The user picks a part of the screen to record. The area is applied when the
+//   mouse is released, and the white frame that marks the area only shows while
+//   it is useful.
+//
+//   Background:
+//     Given the app is open on the home screen
+//     And the recording mode "Selected area" is chosen
+//     And no recording is in progress
+//
+//   Rules: the area is applied when the mouse is released, and the picker needs no keys.
 struct SelectionPickerTests {
     nonisolated static let size = CGSize(width: 1000, height: 800)
 
@@ -34,7 +45,13 @@ struct SelectionPickerTests {
         }
     }
 
-    @Test("Given a valid drag, when the mouse is released, then the area is applied without a key press")
+    // Scenario: A valid drag applies the area
+    //   Given the area picker is open
+    //   When the user drags out an area of at least 64 by 64 and releases the mouse
+    //   Then the picker closes
+    //   And the area is applied
+    //   But no key was pressed
+    @Test("A valid drag applies the area")
     func validDragApplies() {
         let h = Harness()
         h.drag(from: CGPoint(x: 100, y: 100), to: CGPoint(x: 400, y: 300))
@@ -42,28 +59,44 @@ struct SelectionPickerTests {
         #expect(h.finished.first! == CGRect(x: 100, y: 100, width: 300, height: 200))
     }
 
-    @Test("Given a drag of exactly 64 by 64, when the mouse is released, then the area is applied")
+    // Scenario: A drag of exactly 64 by 64 applies the area
+    //   Given the area picker is open
+    //   When the user drags out an area of 64 by 64 and releases the mouse
+    //   Then the area is applied
+    @Test("A drag of exactly 64 by 64 applies the area")
     func boundaryDragApplies() {
         let h = Harness()
         h.drag(from: CGPoint(x: 50, y: 50), to: CGPoint(x: 114, y: 114))
         #expect(h.finished.count == 1)
     }
 
-    @Test("Given a drag of 63 by 63, when the mouse is released, then the picker stays open")
+    // Scenario: A drag of 63 by 63 keeps the picker open
+    //   Given the area picker is open
+    //   When the user drags out an area of 63 by 63 and releases the mouse
+    //   Then the picker stays open
+    @Test("A drag of 63 by 63 keeps the picker open")
     func smallDragStaysOpen() {
         let h = Harness()
         h.drag(from: CGPoint(x: 50, y: 50), to: CGPoint(x: 113, y: 113))
         #expect(h.finished.isEmpty)
     }
 
-    @Test("Given a drag that is wide but too short, when the mouse is released, then the picker stays open")
+    // Scenario: A wide but short drag keeps the picker open
+    //   Given the area picker is open
+    //   When the user drags out an area of 450 by 50 and releases the mouse
+    //   Then the picker stays open
+    @Test("A wide but short drag keeps the picker open")
     func thinDragStaysOpen() {
         let h = Harness()
         h.drag(from: CGPoint(x: 50, y: 50), to: CGPoint(x: 500, y: 100))
         #expect(h.finished.isEmpty)
     }
 
-    @Test("Given a click without a drag, when the mouse is released, then the picker stays open")
+    // Scenario: A click without a drag keeps the picker open
+    //   Given the area picker is open
+    //   When the user clicks without dragging
+    //   Then the picker stays open
+    @Test("A click without a drag keeps the picker open")
     func clickStaysOpen() {
         let h = Harness()
         h.down(200, 200)
@@ -71,7 +104,12 @@ struct SelectionPickerTests {
         #expect(h.finished.isEmpty)
     }
 
-    @Test("Given a too small drag, when the user then drags a valid area, then only the valid area is applied")
+    // Scenario: The user can try again after a drag that was too small
+    //   Given the area picker is open
+    //   And the user dragged an area that was too small
+    //   When the user drags out a valid area and releases the mouse
+    //   Then only the valid area is applied
+    @Test("The user can try again after a drag that was too small")
     func retryAfterSmallDrag() {
         let h = Harness()
         h.drag(from: CGPoint(x: 50, y: 50), to: CGPoint(x: 80, y: 80))
@@ -80,7 +118,11 @@ struct SelectionPickerTests {
         #expect(h.finished.first! == CGRect(x: 200, y: 200, width: 300, height: 250))
     }
 
-    @Test("Given a drag past the view edge, when the mouse is released, then the area is clamped to the screen")
+    // Scenario: A drag past the screen edge is clamped
+    //   Given the area picker is open
+    //   When the user drags past the edge of the screen and releases the mouse
+    //   Then the applied area ends at the screen edge
+    @Test("A drag past the screen edge is clamped")
     func dragClamped() {
         let h = Harness()
         h.drag(from: CGPoint(x: 800, y: 600), to: CGPoint(x: 1500, y: 1200))
@@ -89,7 +131,12 @@ struct SelectionPickerTests {
         #expect(r == CGRect(x: 800, y: 600, width: 200, height: 200))
     }
 
-    @Test("Given an existing selection, when its right edge is dragged and released, then the resized area is applied")
+    // Scenario: Resizing a selection applies it on release
+    //   Given the area picker is open with a selection already drawn
+    //   When the user resizes the selection to at least 64 by 64 and releases the mouse
+    //   Then the picker closes
+    //   And the changed area is applied
+    @Test("Resizing a selection applies it on release")
     func resizeExisting() {
         let h = Harness()
         h.view.selection = CGRect(x: 100, y: 100, width: 200, height: 200)
@@ -100,7 +147,11 @@ struct SelectionPickerTests {
         #expect(h.finished.first! == CGRect(x: 100, y: 100, width: 300, height: 200))
     }
 
-    @Test("Given an existing selection, when it is resized below 64 and released, then the picker stays open")
+    // Scenario: Shrinking a selection below the minimum keeps the picker open
+    //   Given the area picker is open with a selection already drawn
+    //   When the user shrinks the selection below 64 by 64 and releases the mouse
+    //   Then the picker stays open
+    @Test("Shrinking a selection below the minimum keeps the picker open")
     func resizeTooSmall() {
         let h = Harness()
         h.view.selection = CGRect(x: 100, y: 100, width: 200, height: 200)
@@ -110,7 +161,12 @@ struct SelectionPickerTests {
         #expect(h.finished.isEmpty)
     }
 
-    @Test("Given an existing selection, when it is moved and released, then the moved area is applied with the same size")
+    // Scenario: Moving a selection applies it on release
+    //   Given the area picker is open with a selection already drawn
+    //   When the user moves the selection and releases the mouse
+    //   Then the picker closes
+    //   And the moved area is applied with the same size
+    @Test("Moving a selection applies it on release")
     func moveExisting() {
         let h = Harness()
         h.view.selection = CGRect(x: 100, y: 100, width: 200, height: 200)
@@ -120,7 +176,11 @@ struct SelectionPickerTests {
         #expect(h.finished.first! == CGRect(x: 200, y: 160, width: 200, height: 200))
     }
 
-    @Test("Given an existing selection, when the user only clicks inside it, then the picker stays open")
+    // Scenario: A click inside a selection keeps the picker open
+    //   Given the area picker is open with a selection already drawn
+    //   When the user clicks inside the selection without dragging
+    //   Then the picker stays open
+    @Test("A click inside a selection keeps the picker open")
     func clickInsideExisting() {
         let h = Harness()
         h.view.selection = CGRect(x: 100, y: 100, width: 200, height: 200)
@@ -129,7 +189,13 @@ struct SelectionPickerTests {
         #expect(h.finished.isEmpty)
     }
 
-    @Test("Given the picker is open, when Escape is pressed, then it cancels with no area")
+    // Scenario: Esc cancels the picker silently
+    //   Given the area picker is open
+    //   When the user presses Esc
+    //   Then the picker closes
+    //   And no area is applied
+    //   But no message is shown
+    @Test("Esc cancels the picker silently")
     func escapeCancels() {
         let h = Harness()
         h.key(53)
@@ -137,7 +203,11 @@ struct SelectionPickerTests {
         #expect(h.finished.first! == nil)
     }
 
-    @Test("Given a valid selection was dragged and the picker is open, when Return is pressed, then nothing is finished")
+    // Scenario: Return does not finish the picker
+    //   Given the area picker is open with a valid selection drawn
+    //   When the user presses Return
+    //   Then the picker stays open
+    @Test("Return does not finish the picker")
     func returnDoesNothing() {
         let h = Harness()
         h.view.selection = CGRect(x: 100, y: 100, width: 300, height: 300)
@@ -146,11 +216,22 @@ struct SelectionPickerTests {
         #expect(h.finished.isEmpty)
     }
 
-    @Test("Given a valid drag already applied, when the mouse is released again without dragging, then it is not applied twice")
+    // Scenario: A release without a drag does not apply the area twice
+    //   Given the area picker is open
+    //   And a valid drag was already applied
+    //   When the mouse is released again without dragging
+    //   Then the area is applied only once
+    @Test("A release without a drag does not apply the area twice")
     func noDoubleApply() {
         let h = Harness()
         h.drag(from: CGPoint(x: 100, y: 100), to: CGPoint(x: 400, y: 300))
         h.up(400, 300)
         #expect(h.finished.count == 1)
     }
+
+    // @manual
+    // Scenario: The hint mentions no keys
+    //   When the area picker is open
+    //   Then the hint reads "Drag to select an area"
+    //   But the hint does not mention Enter or Esc
 }
