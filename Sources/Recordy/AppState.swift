@@ -4,6 +4,7 @@ import Combine
 import AVFoundation
 import ScreenCaptureKit
 import AppKit
+import CoreAudio
 
 enum RecPhase: Equatable { case idle, countdown(Int), recording, saving }
 
@@ -113,15 +114,34 @@ final class AppState: ObservableObject {
     func refreshDevices() {
         cameras = Devices.cameras()
         mics = Devices.microphones()
-        if !selectedCamera.isEmpty, !cameras.contains(where: { $0.uniqueID == selectedCamera }) { selectedCamera = "" }
-        if !selectedMic.isEmpty, !mics.contains(where: { $0.uniqueID == selectedMic }) { selectedMic = "" }
+        let camera = DeviceDefaults.selection(
+            stored: UserDefaults.standard.string(forKey: "camera"),
+            available: cameras.map(Self.option),
+            systemDefault: AVCaptureDevice.default(for: .video)?.uniqueID,
+            accessDenied: Self.accessDenied(.video))
+        if camera != selectedCamera { selectedCamera = camera }
+        let mic = DeviceDefaults.selection(
+            stored: UserDefaults.standard.string(forKey: "mic"),
+            available: mics.map(Self.option),
+            systemDefault: AVCaptureDevice.default(for: .audio)?.uniqueID,
+            accessDenied: Self.accessDenied(.audio))
+        if mic != selectedMic { selectedMic = mic }
         guard CGPreflightScreenCaptureAccess() else { return }
         Task {
             if let c = try? await SCShareableContent.current {
                 displays = c.displays
-                if !displays.contains(where: { $0.displayID == selectedDisplay }), let d = displays.first { selectedDisplay = d.displayID }
+                if let id = DeviceDefaults.display(current: selectedDisplay, available: displays.map(\.displayID), main: CGMainDisplayID()), id != selectedDisplay { selectedDisplay = id }
             }
         }
+    }
+
+    private static func option(_ d: AVCaptureDevice) -> DeviceOption {
+        DeviceOption(id: d.uniqueID, builtIn: d.transportType == Int32(bitPattern: kAudioDeviceTransportTypeBuiltIn))
+    }
+
+    private static func accessDenied(_ type: AVMediaType) -> Bool {
+        let status = AVCaptureDevice.authorizationStatus(for: type)
+        return status == .denied || status == .restricted
     }
 
     func activeRegion(for displayID: CGDirectDisplayID) -> CGRect? {
