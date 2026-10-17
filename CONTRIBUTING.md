@@ -34,3 +34,9 @@ macOS ties Screen Recording, Camera and Microphone permissions to the app's sign
 ## Reporting bugs
 
 Open an [issue](https://github.com/funivan/recordy/issues) with your macOS version, chip (Apple silicon or Intel), and steps to reproduce.
+
+## Tests
+
+Run `swift test`. CI runs the same command on every pull request.
+
+Behaviour is described as BDD scenarios in `spec/*.feature`. They are documentation, not run by a Gherkin runner; each scenario is covered by a Swift Testing test in `Tests/RecordyTests/`.
