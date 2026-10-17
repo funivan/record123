@@ -112,11 +112,10 @@ enum BgPattern: String, Codable, CaseIterable, Identifiable {
 }
 
 enum BackgroundMode: String, Codable, CaseIterable, Identifiable {
-    case solid, gradient, wallpaper, image
+    case wallpaper, gradient, image
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .solid: return "Solid"
         case .gradient: return "Gradient"
         case .wallpaper: return "Wallpaper"
         case .image: return "Image"
@@ -124,7 +123,6 @@ enum BackgroundMode: String, Codable, CaseIterable, Identifiable {
     }
     var icon: String {
         switch self {
-        case .solid: return "square.fill"
         case .gradient: return "square.lefthalf.filled"
         case .wallpaper: return "photo.fill"
         case .image: return "photo.badge.plus"
@@ -182,14 +180,18 @@ struct Style: Codable, Equatable {
         screenBorder = c.opt(.screenBorder, screenBorder)
         screenBorderColor = c.opt(.screenBorderColor, screenBorderColor)
         bgImageFile = try? c.decodeIfPresent(String.self, forKey: .bgImageFile)
-        bgMode = c.opt(.bgMode, bgImageFile != nil ? .image : (bgGradient ? .gradient : .solid))
+        bgMode = c.opt(.bgMode, bgImageFile != nil ? .image : .gradient)
+        if !bgGradient && bgImageFile == nil {
+            bgColor2 = bgColor1
+            bgGradient = true
+        }
         bgPattern = c.opt(.bgPattern, bgPattern)
     }
 
     mutating func selectBackground(_ mode: BackgroundMode) {
         bgMode = mode
         bgImageFile = nil
-        bgGradient = mode != .solid
+        bgGradient = true
     }
 }
 
@@ -216,21 +218,14 @@ enum Wallpapers {
 struct BackgroundPreset: Identifiable {
     let name: String
     let c1: RGBA, c2: RGBA
-    var gradient = true
     var id: String { name }
     static let all: [BackgroundPreset] = [
-        .init(name: "Signal", c1: RGBA(r: 1.0, g: 0.36, b: 0.2), c2: RGBA(r: 0.55, g: 0.16, b: 0.5), gradient: true),
-        .init(name: "Bone", c1: RGBA(r: 0.96, g: 0.94, b: 0.9), c2: RGBA(r: 0.88, g: 0.84, b: 0.77), gradient: true),
-        .init(name: "Graphite", c1: RGBA(r: 0.17, g: 0.17, b: 0.2), c2: RGBA(r: 0.05, g: 0.05, b: 0.07), gradient: true),
-        .init(name: "Clay", c1: RGBA(r: 0.78, g: 0.42, b: 0.3), c2: RGBA(r: 0.45, g: 0.2, b: 0.17), gradient: true),
-        .init(name: "Lichen", c1: RGBA(r: 0.74, g: 0.8, b: 0.55), c2: RGBA(r: 0.3, g: 0.42, b: 0.3), gradient: true),
-        .init(name: "Cobalt", c1: RGBA(r: 0.1, g: 0.2, b: 0.75), c2: RGBA(r: 0.03, g: 0.07, b: 0.3), gradient: true),
-        .init(name: "Ink", c1: RGBA(r: 0.055, g: 0.055, b: 0.07), c2: RGBA(r: 0.055, g: 0.055, b: 0.07), gradient: false),
-        .init(name: "Paper", c1: RGBA(r: 0.965, g: 0.948, b: 0.915), c2: RGBA(r: 0.965, g: 0.948, b: 0.915), gradient: false),
-        .init(name: "Lime", c1: RGBA(r: 0.78, g: 1.0, b: 0.24), c2: RGBA(r: 0.78, g: 1.0, b: 0.24), gradient: false),
-        .init(name: "Vermilion", c1: RGBA(r: 0.92, g: 0.27, b: 0.14), c2: RGBA(r: 0.92, g: 0.27, b: 0.14), gradient: false),
-        .init(name: "Plum", c1: RGBA(r: 0.24, g: 0.1, b: 0.3), c2: RGBA(r: 0.24, g: 0.1, b: 0.3), gradient: false),
-        .init(name: "Teal", c1: RGBA(r: 0.05, g: 0.38, b: 0.4), c2: RGBA(r: 0.05, g: 0.38, b: 0.4), gradient: false),
+        .init(name: "Signal", c1: RGBA(r: 1.0, g: 0.36, b: 0.2), c2: RGBA(r: 0.55, g: 0.16, b: 0.5)),
+        .init(name: "Bone", c1: RGBA(r: 0.96, g: 0.94, b: 0.9), c2: RGBA(r: 0.88, g: 0.84, b: 0.77)),
+        .init(name: "Graphite", c1: RGBA(r: 0.17, g: 0.17, b: 0.2), c2: RGBA(r: 0.05, g: 0.05, b: 0.07)),
+        .init(name: "Clay", c1: RGBA(r: 0.78, g: 0.42, b: 0.3), c2: RGBA(r: 0.45, g: 0.2, b: 0.17)),
+        .init(name: "Lichen", c1: RGBA(r: 0.74, g: 0.8, b: 0.55), c2: RGBA(r: 0.3, g: 0.42, b: 0.3)),
+        .init(name: "Cobalt", c1: RGBA(r: 0.1, g: 0.2, b: 0.75), c2: RGBA(r: 0.03, g: 0.07, b: 0.3)),
     ]
 }
 

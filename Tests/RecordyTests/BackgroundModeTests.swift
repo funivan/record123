@@ -3,35 +3,35 @@ import Foundation
 @testable import Recordy
 
 /*
-Feature: The background is one choice of solid, gradient, wallpaper or image
+Feature: The background is one choice of wallpaper, gradient or image
   The Background panel shows one section per type. Choosing a type replaces
   the previous background, and a project saved before the type existed keeps
   the background it had.
 */
 struct BackgroundModeTests {
     /*
-    Scenario: Choosing a solid background removes the image and turns off the gradient
+    Scenario: Choosing a gradient background removes the image
       Given the background is a wallpaper
-      When the user chooses the solid type
-      Then the background is a solid colour
+      When the user chooses the gradient type
+      Then the background is a gradient
       And no image is set
     */
-    @Test("Choosing a solid background removes the image and turns off the gradient")
-    func solidRemovesImage() {
+    @Test("Choosing a gradient background removes the image")
+    func gradientRemovesImage() {
         var style = Style()
         style.selectBackground(.wallpaper)
         style.bgImageFile = "wallpaper.jpg"
 
-        style.selectBackground(.solid)
+        style.selectBackground(.gradient)
 
-        #expect(style.bgMode == .solid)
-        #expect(style.bgGradient == false)
+        #expect(style.bgMode == .gradient)
+        #expect(style.bgGradient == true)
         #expect(style.bgImageFile == nil)
     }
 
     /*
     Scenario: Choosing a wallpaper sets the image and keeps the type
-      Given the background is a solid colour
+      Given the background is a gradient
       When the user chooses a wallpaper
       Then the background is that wallpaper
       And the type is wallpaper
@@ -39,7 +39,7 @@ struct BackgroundModeTests {
     @Test("Choosing a wallpaper sets the image and keeps the type")
     func wallpaperSetsImage() {
         var style = Style()
-        style.selectBackground(.solid)
+        style.selectBackground(.gradient)
 
         style.selectBackground(.wallpaper)
         style.bgImageFile = "wallpaper.jpg"
@@ -64,18 +64,21 @@ struct BackgroundModeTests {
     }
 
     /*
-    Scenario: A project saved before the type existed without an image is shown as a solid colour when the gradient is off
-      Given a saved style has no image file, the gradient is off and no type
+    Scenario: A project saved with a solid colour keeps its look as a gradient
+      Given a saved style has no image file, the gradient is off and the colour is red
       When the project is loaded
-      Then the type is solid
+      Then the type is gradient
+      And both gradient colours are red
     */
-    @Test("A project saved before the type existed without an image is shown as a solid colour when the gradient is off")
-    func legacySolidDecodesAsSolid() throws {
-        let json = #"{"bgGradient":false}"#.data(using: .utf8)!
+    @Test("A project saved with a solid colour keeps its look as a gradient")
+    func legacySolidBecomesFlatGradient() throws {
+        let json = #"{"bgGradient":false,"bgColor1":{"r":1,"g":0,"b":0,"a":1},"bgColor2":{"r":0,"g":0,"b":1,"a":1}}"#.data(using: .utf8)!
 
         let style = try JSONDecoder().decode(Style.self, from: json)
 
-        #expect(style.bgMode == .solid)
+        #expect(style.bgMode == .gradient)
+        #expect(style.bgGradient == true)
+        #expect(style.bgColor2 == style.bgColor1)
     }
 
     /*

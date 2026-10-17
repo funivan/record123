@@ -140,14 +140,8 @@ struct InspectorView: View {
                 }
             }
             switch model.project.style.bgMode {
-            case .solid:
-                presetGrid(BackgroundPreset.all.filter { !$0.gradient }) { p in
-                    model.project.style.bgColor1 = p.c1
-                    model.project.style.selectBackground(.solid)
-                }
-                ColorPicker("Color", selection: Binding(get: { style.wrappedValue.bgColor1.color }, set: { model.project.style.bgColor1.color = $0 }))
             case .gradient:
-                presetGrid(BackgroundPreset.all.filter(\.gradient)) { p in
+                presetGrid(BackgroundPreset.all) { p in
                     model.project.style.bgColor1 = p.c1
                     model.project.style.bgColor2 = p.c2
                     model.project.style.selectBackground(.gradient)
@@ -191,7 +185,7 @@ struct InspectorView: View {
     private func presetGrid(_ presets: [BackgroundPreset], apply: @escaping (BackgroundPreset) -> Void) -> some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 8) {
             ForEach(presets) { p in
-                let selected = model.project.style.bgColor1 == p.c1 && (!p.gradient || model.project.style.bgColor2 == p.c2)
+                let selected = model.project.style.bgColor1 == p.c1 && model.project.style.bgColor2 == p.c2
                 Button { apply(p) } label: {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(LinearGradient(colors: [p.c1.color, p.c2.color], startPoint: .topLeading, endPoint: .bottomTrailing))
