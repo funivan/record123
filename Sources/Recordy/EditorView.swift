@@ -68,6 +68,22 @@ struct EditorView: View {
 
     private var editorColumn: some View {
         VStack(spacing: 0) {
+            preview
+                .padding(.top, 8)
+            transport
+            TimelineView(model: model)
+                .frame(height: TimelineView.height(for: model.project))
+                .padding(.horizontal, 14)
+                .padding(.bottom, 12)
+        }
+    }
+
+    @ViewBuilder
+    private var preview: some View {
+        if model.croppingArea {
+            CropEditorView(model: model)
+                .padding(.horizontal, 14)
+        } else {
             PlayerView(player: model.player)
                 .aspectRatio(outputSize(for: model.project).width / outputSize(for: model.project).height, contentMode: .fit)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -75,12 +91,6 @@ struct EditorView: View {
                 .padding(.horizontal, 14)
                 .overlay { if model.project.cameraFile != nil { CameraDragLayer(model: model) } }
                 .overlay { if model.pickingFocus && model.selectedZoom != nil { FocusPickerLayer(model: model) } }
-                .padding(.top, 8)
-            transport
-            TimelineView(model: model)
-                .frame(height: TimelineView.height(for: model.project))
-                .padding(.horizontal, 14)
-                .padding(.bottom, 12)
         }
     }
 

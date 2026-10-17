@@ -33,6 +33,7 @@ final class EditorModel: ObservableObject {
     @Published var selectedCamera: UUID?
     @Published var selectedAudio: UUID?
     @Published var pickingFocus = false
+    @Published var croppingArea = false
     @Published var isRecordingVoice = false
     @Published var loadError: String?
     @Published var ready = false
@@ -146,12 +147,34 @@ final class EditorModel: ObservableObject {
     }
 
     func togglePlay() {
+        if croppingArea { return }
         if isRecordingVoice { finishVoice(); return }
         if player.rate != 0 { player.pause(); isPlaying = false; return }
         if time >= project.trimEnd - 0.05 { seek(to: project.trimStart) }
         player.play()
         isPlaying = true
     }
+
+    func beginCrop() {
+        if isRecordingVoice { finishVoice() }
+        player.pause()
+        isPlaying = false
+        pickingFocus = false
+        croppingArea = true
+    }
+
+    func setCrop(_ c: CropRect?) {
+        defer { croppingArea = false }
+        var next = c?.clamped()
+        if next?.isFull() == true { next = nil }
+        guard next != project.crop else { return }
+        lastPush = .distantPast
+        project.crop = next
+    }
+
+    func cancelCrop() { croppingArea = false }
+
+    func resetCrop() { setCrop(nil) }
 
     func commitTrim() { rebuild(seekTo: min(max(time, project.trimStart), project.trimEnd)) }
 
@@ -358,23 +381,6 @@ final class EditorModel: ObservableObject {
 
     func applyWallpaper(_ src: URL) {
         project.style.bgImageFile = src.lastPathComponent
-    }
-
-    func applyFullScreen() {
-        project.style.aspect = .original
-        project.style.resolution = 0
-        project.style.padding = 0
-        project.style.cornerRadius = 0
-        project.style.shadow = 0
-        project.style.screenBorder = 0
-    }
-
-    func applyFramed() {
-        project.style.aspect = .wide16x9
-        project.style.resolution = 1080
-        project.style.padding = 0.07
-        project.style.cornerRadius = 0.025
-        project.style.shadow = 0.55
     }
 
     func chooseBackgroundImage() {
