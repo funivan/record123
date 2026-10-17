@@ -191,7 +191,7 @@ final class Compositor: NSObject, AVVideoCompositing {
             guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0, space: cs,
                                       bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
             ctx.setFillColor(CGColor(gray: ink, alpha: 0.16))
-            ctx.setStrokeColor(CGColor(gray: ink, alpha: 0.12))
+            ctx.setStrokeColor(CGColor(gray: ink, alpha: 0.32))
             let unit = min / 1080
             switch s.bgPattern {
             case .dots:
@@ -200,7 +200,7 @@ final class Compositor: NSObject, AVVideoCompositing {
                 while y < size.height { var x = step / 2; while x < size.width { ctx.fillEllipse(in: CGRect(x: x - r, y: y - r, width: r * 2, height: r * 2)); x += step }; y += step }
             case .grid:
                 let step = 60 * unit
-                ctx.setLineWidth(max(1, unit))
+                ctx.setLineWidth(max(1.5, 1.5 * unit))
                 var x: CGFloat = 0
                 while x < size.width { ctx.move(to: CGPoint(x: x, y: 0)); ctx.addLine(to: CGPoint(x: x, y: size.height)); x += step }
                 var y: CGFloat = 0
@@ -208,7 +208,7 @@ final class Compositor: NSObject, AVVideoCompositing {
                 ctx.strokePath()
             default:
                 let step = 28 * unit
-                ctx.setLineWidth(max(1.2, 1.5 * unit))
+                ctx.setLineWidth(max(2, 2.5 * unit))
                 var x = -size.height
                 while x < size.width { ctx.move(to: CGPoint(x: x, y: 0)); ctx.addLine(to: CGPoint(x: x + size.height, y: size.height)); x += step }
                 ctx.strokePath()

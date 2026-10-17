@@ -150,6 +150,9 @@ struct InspectorView: View {
                     ColorPicker("Left", selection: Binding(get: { style.wrappedValue.bgColor1.color }, set: { model.project.style.bgColor1.color = $0 }))
                     ColorPicker("Right", selection: Binding(get: { style.wrappedValue.bgColor2.color }, set: { model.project.style.bgColor2.color = $0 }))
                 }
+                Picker("Pattern", selection: style.bgPattern) {
+                    ForEach(BgPattern.allCases) { Text($0.label).tag($0) }
+                }
             case .wallpaper:
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
                     ForEach(Wallpapers.all, id: \.self) { url in
@@ -175,9 +178,6 @@ struct InspectorView: View {
                         Button("Remove image") { model.project.style.selectBackground(.gradient) }.buttonStyle(SoftButtonStyle())
                     }
                 }
-            }
-            Picker("Pattern", selection: style.bgPattern) {
-                ForEach(BgPattern.allCases) { Text($0.label).tag($0) }
             }
         }
     }

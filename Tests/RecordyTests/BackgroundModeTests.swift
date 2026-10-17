@@ -94,4 +94,21 @@ struct BackgroundModeTests {
         #expect(style.bgMode == .wallpaper)
         #expect(style.bgImageFile == "27-ukraine-halftone.jpg")
     }
+
+    /*
+    Scenario: The pattern only applies to a gradient
+      Given the background is a gradient with the lines pattern
+      When the user chooses the wallpaper type
+      Then no pattern is set
+    */
+    @Test("The pattern only applies to a gradient")
+    func patternClearedOutsideGradient() {
+        var style = Style()
+        style.selectBackground(.gradient)
+        style.bgPattern = .lines
+
+        style.selectBackground(.wallpaper)
+
+        #expect(style.bgPattern == .none)
+    }
 }

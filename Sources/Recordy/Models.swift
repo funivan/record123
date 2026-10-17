@@ -185,13 +185,14 @@ struct Style: Codable, Equatable {
             bgColor2 = bgColor1
             bgGradient = true
         }
-        bgPattern = c.opt(.bgPattern, bgPattern)
+        bgPattern = bgMode == .gradient ? c.opt(.bgPattern, bgPattern) : .none
     }
 
     mutating func selectBackground(_ mode: BackgroundMode) {
         bgMode = mode
         bgImageFile = nil
         bgGradient = true
+        if mode != .gradient { bgPattern = .none }
     }
 }
 
