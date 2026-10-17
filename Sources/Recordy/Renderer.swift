@@ -184,7 +184,7 @@ final class Compositor: NSObject, AVVideoCompositing {
             m.rVector = CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0)
             m.gVector = CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0)
             m.bVector = CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0)
-            m.aVector = CIVector(x: 0, y: 0, z: 0, w: 0.16)
+            m.aVector = CIVector(x: 0, y: 0, z: 0, w: 0.3)
             return m.outputImage
         default:
             let w = Int(size.width), h = Int(size.height)
