@@ -10,7 +10,7 @@ final class EditorModel: ObservableObject {
     let exporter = Exporter()
     private let renderState: RenderState
     private var builtSize = CGSize.zero
-    private var nudge = false
+    private var refreshCount = 0
     private var undoStack: [Project] = []
     private var redoStack: [Project] = []
     private var restoring = false
@@ -135,8 +135,8 @@ final class EditorModel: ObservableObject {
 
     func refreshFrame() {
         guard player.rate == 0 else { return }
-        nudge.toggle()
-        let t = player.currentTime() + CMTime(value: nudge ? 1 : 0, timescale: 1000)
+        refreshCount = (refreshCount + 1) % 4000
+        let t = player.currentTime() + CMTime(value: CMTimeValue(refreshCount), timescale: 1_000_000)
         player.seek(to: t, toleranceBefore: .zero, toleranceAfter: .zero)
     }
 
@@ -380,6 +380,7 @@ final class EditorModel: ObservableObject {
     }
 
     func applyWallpaper(_ src: URL) {
+        project.style.selectBackground(.wallpaper)
         project.style.bgImageFile = src.lastPathComponent
     }
 
@@ -387,6 +388,7 @@ final class EditorModel: ObservableObject {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.image]
         guard panel.runModal() == .OK, let src = panel.url, let name = BackgroundImages.importImage(src) else { return }
+        project.style.selectBackground(.image)
         project.style.bgImageFile = name
     }
 

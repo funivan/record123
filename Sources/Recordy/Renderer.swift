@@ -183,23 +183,23 @@ final class Compositor: NSObject, AVVideoCompositing {
             m.rVector = CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0)
             m.gVector = CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0)
             m.bVector = CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0)
-            m.aVector = CIVector(x: 0, y: 0, z: 0, w: 0.16)
+            m.aVector = CIVector(x: 0, y: 0, z: 0, w: 0.3)
             return m.outputImage
         default:
             let w = Int(size.width), h = Int(size.height)
             guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0, space: cs,
                                       bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
             ctx.setFillColor(CGColor(gray: ink, alpha: 0.16))
-            ctx.setStrokeColor(CGColor(gray: ink, alpha: 0.12))
+            ctx.setStrokeColor(CGColor(gray: ink, alpha: 0.32))
             let unit = min / 1080
             switch s.bgPattern {
             case .dots:
-                let step = 34 * unit, r = 2.2 * unit
+                let step = 34 * unit, r = 3.2 * unit
                 var y = step / 2
                 while y < size.height { var x = step / 2; while x < size.width { ctx.fillEllipse(in: CGRect(x: x - r, y: y - r, width: r * 2, height: r * 2)); x += step }; y += step }
             case .grid:
                 let step = 60 * unit
-                ctx.setLineWidth(max(1, unit))
+                ctx.setLineWidth(max(1.5, 1.5 * unit))
                 var x: CGFloat = 0
                 while x < size.width { ctx.move(to: CGPoint(x: x, y: 0)); ctx.addLine(to: CGPoint(x: x, y: size.height)); x += step }
                 var y: CGFloat = 0
@@ -207,7 +207,7 @@ final class Compositor: NSObject, AVVideoCompositing {
                 ctx.strokePath()
             default:
                 let step = 28 * unit
-                ctx.setLineWidth(max(1.2, 1.5 * unit))
+                ctx.setLineWidth(max(2, 2.5 * unit))
                 var x = -size.height
                 while x < size.width { ctx.move(to: CGPoint(x: x, y: 0)); ctx.addLine(to: CGPoint(x: x + size.height, y: size.height)); x += step }
                 ctx.strokePath()

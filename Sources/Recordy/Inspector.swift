@@ -128,50 +128,79 @@ struct InspectorView: View {
 
     var background: some View {
         Section_(title: "Background", icon: "paintpalette.fill", expanded: true) {
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 5), spacing: 8) {
-                ForEach(BackgroundPreset.all) { p in
-                    Button {
-                        model.project.style.bgColor1 = p.c1
-                        model.project.style.bgColor2 = p.c2
-                        model.project.style.bgGradient = p.gradient
-                        model.project.style.bgImageFile = nil
-                    } label: {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(LinearGradient(colors: [p.c1.color, p.c2.color], startPoint: .topLeading, endPoint: .bottomTrailing))
-                            .frame(height: 30)
+            HStack(spacing: 6) {
+                ForEach(BackgroundMode.allCases) { mode in
+                    let selected = model.project.style.bgMode == mode
+                    Button { if !selected { model.project.style.selectBackground(mode) } } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: mode.icon).font(.system(size: 15))
+                            Text(mode.label).font(.system(size: 11, weight: .medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(selected ? Theme.signal : Theme.bone.opacity(0.7))
+                        .background(selected ? Theme.signal.opacity(0.16) : Theme.bone.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(selected ? Theme.signal : Color.clear, lineWidth: 1.5))
+                        .contentShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
-                    .help(p.name)
                 }
             }
-            Text("Wallpapers").font(.callout.bold())
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
-                ForEach(Wallpapers.all, id: \.self) { url in
-                    Button { model.applyWallpaper(url) } label: {
-                        WallpaperThumb(url: url)
-                            .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(model.project.style.bgImageFile == url.lastPathComponent ? Theme.signal : Color.clear, lineWidth: 2))
+            switch model.project.style.bgMode {
+            case .gradient:
+                presetGrid(BackgroundPreset.all) { p in
+                    model.project.style.bgColor1 = p.c1
+                    model.project.style.bgColor2 = p.c2
+                    model.project.style.selectBackground(.gradient)
+                }
+                HStack {
+                    ColorPicker("Left", selection: Binding(get: { style.wrappedValue.bgColor1.color }, set: { model.project.style.bgColor1.color = $0 }))
+                    ColorPicker("Right", selection: Binding(get: { style.wrappedValue.bgColor2.color }, set: { model.project.style.bgColor2.color = $0 }))
+                }
+                Picker("Pattern", selection: style.bgPattern) {
+                    ForEach(BgPattern.allCases) { Text($0.label).tag($0) }
+                }
+            case .wallpaper:
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
+                    ForEach(Wallpapers.all, id: \.self) { url in
+                        Button { model.applyWallpaper(url) } label: {
+                            WallpaperThumb(url: url)
+                                .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                                .clipped()
+                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(model.project.style.bgImageFile == url.lastPathComponent ? Theme.signal : Color.clear, lineWidth: 2))
+                        }
+                        .buttonStyle(.plain)
+                        .help(url.deletingPathExtension().lastPathComponent)
                     }
-                    .buttonStyle(.plain)
-                    .help(url.deletingPathExtension().lastPathComponent)
+                }
+            case .image:
+                if model.project.style.bgImageFile == nil {
+                    Text("Pick a picture to use as the background.").font(.caption).foregroundStyle(.secondary)
+                }
+                HStack {
+                    Button("Choose image…") { model.chooseBackgroundImage() }.buttonStyle(SoftButtonStyle())
+                    if model.project.style.bgImageFile != nil {
+                        Button("Remove image") { model.project.style.selectBackground(.gradient) }.buttonStyle(SoftButtonStyle())
+                    }
                 }
             }
-            HStack {
-                Button("Choose image…") { model.chooseBackgroundImage() }.buttonStyle(SoftButtonStyle())
-                if model.project.style.bgImageFile != nil {
-                    Button("Remove image") { model.project.style.bgImageFile = nil }.buttonStyle(SoftButtonStyle())
+        }
+    }
+
+    private func presetGrid(_ presets: [BackgroundPreset], apply: @escaping (BackgroundPreset) -> Void) -> some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 8) {
+            ForEach(presets) { p in
+                let selected = model.project.style.bgColor1 == p.c1 && model.project.style.bgColor2 == p.c2
+                Button { apply(p) } label: {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(LinearGradient(colors: [p.c1.color, p.c2.color], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(height: 34)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(selected ? Theme.signal : Theme.bone.opacity(0.12), lineWidth: selected ? 2 : 1))
                 }
-            }
-            Picker("Pattern", selection: style.bgPattern) {
-                ForEach(BgPattern.allCases) { Text($0.label).tag($0) }
-            }
-            Toggle("Gradient", isOn: style.bgGradient).disabled(model.project.style.bgImageFile != nil)
-            HStack {
-                ColorPicker("Color 1", selection: Binding(get: { style.wrappedValue.bgColor1.color }, set: { model.project.style.bgColor1.color = $0 }))
-                if model.project.style.bgGradient {
-                    ColorPicker("Color 2", selection: Binding(get: { style.wrappedValue.bgColor2.color }, set: { model.project.style.bgColor2.color = $0 }))
-                }
+                .buttonStyle(.plain)
+                .help(p.name)
             }
         }
     }

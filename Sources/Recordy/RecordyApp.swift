@@ -17,6 +17,10 @@ struct RecordyApp: App {
                 Button("Back to Recordings") { state.closeEditor() }.keyboardShortcut("[")
                     .disabled(state.editor == nil)
             }
+            CommandGroup(replacing: .saveItem) {
+                Button("Close and Quit") { NSApp.terminate(nil) }.keyboardShortcut("w")
+                Button("Close and Quit (Ctrl)") { NSApp.terminate(nil) }.keyboardShortcut("w", modifiers: .control)
+            }
             CommandGroup(replacing: .undoRedo) {
                 Button("Undo") { state.editor?.undo() }.keyboardShortcut("z")
                 Button("Redo") { state.editor?.redo() }.keyboardShortcut("z", modifiers: [.command, .shift])
