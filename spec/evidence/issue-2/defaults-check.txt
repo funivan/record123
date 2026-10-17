@@ -1,0 +1,36 @@
+Issue #2 UI check, MacBookPro18,3, Recordy.app built from branch issue-2-improve-defaults
+Values read with the Accessibility API (System Events) from the home screen, left recorder column.
+
+Authorization (Recordy's own permission bar on the home screen): "Screen recording - OK", "Microphone - OK", "Camera - OK"
+  (PermissionsStatusBar shows OK only when AVCaptureDevice.authorizationStatus == .authorized for that media type)
+Devices available to the pickers (menu items): microphone = [No microphone, MacBook Pro Microphone], camera = [No camera, FaceTime HD Camera]
+  No iPhone Continuity device was present during this run, so the "built-in is not first" ordering is covered by unit tests only.
+
+=== Run 1 (AC 11): camera and mic keys absent before launch ===
+before launch:
+  defaults read com.funivan.recordy camera -> does not exist
+  defaults read com.funivan.recordy mic    -> does not exist
+  defaults read com.funivan.recordy sysAudio -> does not exist
+AX values after launch:
+  Screen picker (AXPopUpButton)      = "Built-in Retina Display - 1512x982"
+  Mode pill                          = "Full display" highlighted (screenshot home-defaults.jpg; the pill buttons have no AX value)
+  Audio picker (AXPopUpButton)       = "MacBook Pro Microphone"
+  Record system audio (AXCheckBox)   = 0 (off)
+  Camera picker (AXPopUpButton)      = "FaceTime HD Camera"
+defaults after launch:
+  camera = 47B4B64B-7067-4B9C-AD2B-AE273A71F4B5
+  mic    = BuiltInMicrophoneDevice
+  sysAudio = does not exist
+
+=== Run 2 (AC 12): camera set to the empty string, mic key absent ===
+  defaults write com.funivan.recordy camera -string ""
+AX values after relaunch:
+  Screen picker                      = "Built-in Retina Display - 1512x982"
+  Audio picker                       = "MacBook Pro Microphone"
+  Record system audio (AXCheckBox)   = 0 (off)
+  Camera picker                      = "No camera"
+defaults after launch:
+  camera = (empty string, kept)
+  mic    = BuiltInMicrophoneDevice
+
+Preferences were restored from a backup taken before the test; the app then rewrote camera and mic with the built-in ids on its next launch (by design).
