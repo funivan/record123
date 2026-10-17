@@ -108,7 +108,7 @@ private enum Drag {
     case resize(Edges, start: CGRect)
 }
 
-private final class SelectionView: NSView {
+final class SelectionView: NSView {
     var selection: CGRect? {
         didSet {
             needsDisplay = true
