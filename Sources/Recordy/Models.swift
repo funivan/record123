@@ -121,7 +121,7 @@ struct Style: Codable, Equatable {
     var cameraBorder = 4.0
     var cameraBorderColor = RGBA(r: 1, g: 1, b: 1)
     var cameraMirror = true
-    var cameraBlur = false
+    var cameraBlur = true
     var zoomLevel = 2.0
     var zoomDuration = 0.9
     var cameraMoveDuration = 0.5
@@ -147,7 +147,7 @@ struct Style: Codable, Equatable {
         cameraBorder = c.opt(.cameraBorder, cameraBorder)
         cameraBorderColor = c.opt(.cameraBorderColor, cameraBorderColor)
         cameraMirror = c.opt(.cameraMirror, cameraMirror)
-        cameraBlur = c.opt(.cameraBlur, cameraBlur)
+        cameraBlur = c.opt(.cameraBlur, false)
         zoomLevel = c.opt(.zoomLevel, zoomLevel)
         zoomDuration = c.opt(.zoomDuration, zoomDuration)
         cameraMoveDuration = c.opt(.cameraMoveDuration, cameraMoveDuration)
