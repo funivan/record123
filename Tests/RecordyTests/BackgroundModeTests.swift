@@ -77,4 +77,18 @@ struct BackgroundModeTests {
 
         #expect(style.bgMode == .solid)
     }
+
+    /*
+    Scenario: A new project starts with the blue and yellow dotted wallpaper
+      Given a new project
+      When the editor opens it
+      Then the background is the blue and yellow halftone wallpaper
+    */
+    @Test("A new project starts with the blue and yellow dotted wallpaper")
+    func defaultWallpaper() {
+        let style = Style()
+
+        #expect(style.bgMode == .wallpaper)
+        #expect(style.bgImageFile == "27-ukraine-halftone.jpg")
+    }
 }

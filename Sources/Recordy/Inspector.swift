@@ -121,10 +121,24 @@ struct InspectorView: View {
 
     var background: some View {
         Section_(title: "Background", icon: "paintpalette.fill", expanded: true) {
-            Picker("Type", selection: backgroundMode) {
-                ForEach(BackgroundMode.allCases) { Text($0.label).tag($0) }
+            HStack(spacing: 6) {
+                ForEach(BackgroundMode.allCases) { mode in
+                    let selected = model.project.style.bgMode == mode
+                    Button { if !selected { model.project.style.selectBackground(mode) } } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: mode.icon).font(.system(size: 15))
+                            Text(mode.label).font(.system(size: 11, weight: .medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(selected ? Theme.signal : Theme.bone.opacity(0.7))
+                        .background(selected ? Theme.signal.opacity(0.16) : Theme.bone.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(selected ? Theme.signal : Color.clear, lineWidth: 1.5))
+                        .contentShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(.plain)
+                }
             }
-            .pickerStyle(.segmented)
             switch model.project.style.bgMode {
             case .solid:
                 presetGrid(BackgroundPreset.all.filter { !$0.gradient }) { p in
@@ -158,6 +172,9 @@ struct InspectorView: View {
                     }
                 }
             case .image:
+                if model.project.style.bgImageFile == nil {
+                    Text("Pick a picture to use as the background.").font(.caption).foregroundStyle(.secondary)
+                }
                 HStack {
                     Button("Choose image…") { model.chooseBackgroundImage() }.buttonStyle(SoftButtonStyle())
                     if model.project.style.bgImageFile != nil {
@@ -171,17 +188,15 @@ struct InspectorView: View {
         }
     }
 
-    private var backgroundMode: Binding<BackgroundMode> {
-        Binding(get: { model.project.style.bgMode }, set: { model.project.style.selectBackground($0) })
-    }
-
     private func presetGrid(_ presets: [BackgroundPreset], apply: @escaping (BackgroundPreset) -> Void) -> some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 8) {
             ForEach(presets) { p in
+                let selected = model.project.style.bgColor1 == p.c1 && (!p.gradient || model.project.style.bgColor2 == p.c2)
                 Button { apply(p) } label: {
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: 8)
                         .fill(LinearGradient(colors: [p.c1.color, p.c2.color], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(height: 30)
+                        .frame(height: 34)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(selected ? Theme.signal : Theme.bone.opacity(0.12), lineWidth: selected ? 2 : 1))
                 }
                 .buttonStyle(.plain)
                 .help(p.name)

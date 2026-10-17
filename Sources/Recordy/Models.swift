@@ -122,13 +122,21 @@ enum BackgroundMode: String, Codable, CaseIterable, Identifiable {
         case .image: return "Image"
         }
     }
+    var icon: String {
+        switch self {
+        case .solid: return "square.fill"
+        case .gradient: return "square.lefthalf.filled"
+        case .wallpaper: return "photo.fill"
+        case .image: return "photo.badge.plus"
+        }
+    }
 }
 
 struct Style: Codable, Equatable {
     var bgColor1 = RGBA(r: 1.0, g: 0.36, b: 0.2)
     var bgColor2 = RGBA(r: 0.55, g: 0.16, b: 0.5)
     var bgGradient = true
-    var bgMode = BackgroundMode.gradient
+    var bgMode = BackgroundMode.wallpaper
     var bgAngle = 135.0
     var padding = 0.07
     var cornerRadius = 0.025
@@ -146,7 +154,7 @@ struct Style: Codable, Equatable {
     var cursorSmoothing = 0.35
     var screenBorder = 0.0
     var screenBorderColor = RGBA(r: 1, g: 1, b: 1, a: 0.6)
-    var bgImageFile: String?
+    var bgImageFile: String? = Wallpapers.defaultName
     var bgPattern = BgPattern.none
 
     init() {}
@@ -192,6 +200,7 @@ extension KeyedDecodingContainer {
 }
 
 enum Wallpapers {
+    static let defaultName = "27-ukraine-halftone.jpg"
     static var dir: URL? {
         let candidates = [Bundle.main.resourceURL?.appendingPathComponent("Wallpapers"),
                           URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("Resources/Wallpapers")]
