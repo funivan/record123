@@ -195,7 +195,7 @@ final class Compositor: NSObject, AVVideoCompositing {
             let unit = min / 1080
             switch s.bgPattern {
             case .dots:
-                let step = 34 * unit, r = 2.2 * unit
+                let step = 34 * unit, r = 3.2 * unit
                 var y = step / 2
                 while y < size.height { var x = step / 2; while x < size.width { ctx.fillEllipse(in: CGRect(x: x - r, y: y - r, width: r * 2, height: r * 2)); x += step }; y += step }
             case .grid:
