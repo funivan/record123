@@ -111,10 +111,24 @@ enum BgPattern: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+enum BackgroundMode: String, Codable, CaseIterable, Identifiable {
+    case solid, gradient, wallpaper, image
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .solid: return "Solid"
+        case .gradient: return "Gradient"
+        case .wallpaper: return "Wallpaper"
+        case .image: return "Image"
+        }
+    }
+}
+
 struct Style: Codable, Equatable {
     var bgColor1 = RGBA(r: 1.0, g: 0.36, b: 0.2)
     var bgColor2 = RGBA(r: 0.55, g: 0.16, b: 0.5)
     var bgGradient = true
+    var bgMode = BackgroundMode.gradient
     var bgAngle = 135.0
     var padding = 0.07
     var cornerRadius = 0.025
@@ -160,7 +174,14 @@ struct Style: Codable, Equatable {
         screenBorder = c.opt(.screenBorder, screenBorder)
         screenBorderColor = c.opt(.screenBorderColor, screenBorderColor)
         bgImageFile = try? c.decodeIfPresent(String.self, forKey: .bgImageFile)
+        bgMode = c.opt(.bgMode, bgImageFile != nil ? .image : (bgGradient ? .gradient : .solid))
         bgPattern = c.opt(.bgPattern, bgPattern)
+    }
+
+    mutating func selectBackground(_ mode: BackgroundMode) {
+        bgMode = mode
+        bgImageFile = nil
+        bgGradient = mode != .solid
     }
 }
 

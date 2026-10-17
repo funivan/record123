@@ -357,6 +357,7 @@ final class EditorModel: ObservableObject {
     }
 
     func applyWallpaper(_ src: URL) {
+        project.style.selectBackground(.wallpaper)
         project.style.bgImageFile = src.lastPathComponent
     }
 
@@ -381,6 +382,7 @@ final class EditorModel: ObservableObject {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.image]
         guard panel.runModal() == .OK, let src = panel.url, let name = BackgroundImages.importImage(src) else { return }
+        project.style.selectBackground(.image)
         project.style.bgImageFile = name
     }
 

@@ -121,50 +121,70 @@ struct InspectorView: View {
 
     var background: some View {
         Section_(title: "Background", icon: "paintpalette.fill", expanded: true) {
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 5), spacing: 8) {
-                ForEach(BackgroundPreset.all) { p in
-                    Button {
-                        model.project.style.bgColor1 = p.c1
-                        model.project.style.bgColor2 = p.c2
-                        model.project.style.bgGradient = p.gradient
-                        model.project.style.bgImageFile = nil
-                    } label: {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(LinearGradient(colors: [p.c1.color, p.c2.color], startPoint: .topLeading, endPoint: .bottomTrailing))
-                            .frame(height: 30)
-                    }
-                    .buttonStyle(.plain)
-                    .help(p.name)
-                }
+            Picker("Type", selection: backgroundMode) {
+                ForEach(BackgroundMode.allCases) { Text($0.label).tag($0) }
             }
-            Text("Wallpapers").font(.callout.bold())
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
-                ForEach(Wallpapers.all, id: \.self) { url in
-                    Button { model.applyWallpaper(url) } label: {
-                        WallpaperThumb(url: url)
-                            .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(model.project.style.bgImageFile == url.lastPathComponent ? Theme.signal : Color.clear, lineWidth: 2))
-                    }
-                    .buttonStyle(.plain)
-                    .help(url.deletingPathExtension().lastPathComponent)
+            .pickerStyle(.segmented)
+            switch model.project.style.bgMode {
+            case .solid:
+                presetGrid(BackgroundPreset.all.filter { !$0.gradient }) { p in
+                    model.project.style.bgColor1 = p.c1
+                    model.project.style.selectBackground(.solid)
                 }
-            }
-            HStack {
-                Button("Choose image…") { model.chooseBackgroundImage() }.buttonStyle(SoftButtonStyle())
-                if model.project.style.bgImageFile != nil {
-                    Button("Remove image") { model.project.style.bgImageFile = nil }.buttonStyle(SoftButtonStyle())
+                ColorPicker("Color", selection: Binding(get: { style.wrappedValue.bgColor1.color }, set: { model.project.style.bgColor1.color = $0 }))
+            case .gradient:
+                presetGrid(BackgroundPreset.all.filter(\.gradient)) { p in
+                    model.project.style.bgColor1 = p.c1
+                    model.project.style.bgColor2 = p.c2
+                    model.project.style.selectBackground(.gradient)
+                }
+                HStack {
+                    ColorPicker("Left", selection: Binding(get: { style.wrappedValue.bgColor1.color }, set: { model.project.style.bgColor1.color = $0 }))
+                    ColorPicker("Right", selection: Binding(get: { style.wrappedValue.bgColor2.color }, set: { model.project.style.bgColor2.color = $0 }))
+                }
+            case .wallpaper:
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
+                    ForEach(Wallpapers.all, id: \.self) { url in
+                        Button { model.applyWallpaper(url) } label: {
+                            WallpaperThumb(url: url)
+                                .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                                .clipped()
+                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(model.project.style.bgImageFile == url.lastPathComponent ? Theme.signal : Color.clear, lineWidth: 2))
+                        }
+                        .buttonStyle(.plain)
+                        .help(url.deletingPathExtension().lastPathComponent)
+                    }
+                }
+            case .image:
+                HStack {
+                    Button("Choose image…") { model.chooseBackgroundImage() }.buttonStyle(SoftButtonStyle())
+                    if model.project.style.bgImageFile != nil {
+                        Button("Remove image") { model.project.style.selectBackground(.gradient) }.buttonStyle(SoftButtonStyle())
+                    }
                 }
             }
             Picker("Pattern", selection: style.bgPattern) {
                 ForEach(BgPattern.allCases) { Text($0.label).tag($0) }
             }
-            Toggle("Gradient", isOn: style.bgGradient).disabled(model.project.style.bgImageFile != nil)
-            HStack {
-                ColorPicker("Color 1", selection: Binding(get: { style.wrappedValue.bgColor1.color }, set: { model.project.style.bgColor1.color = $0 }))
-                if model.project.style.bgGradient {
-                    ColorPicker("Color 2", selection: Binding(get: { style.wrappedValue.bgColor2.color }, set: { model.project.style.bgColor2.color = $0 }))
+        }
+    }
+
+    private var backgroundMode: Binding<BackgroundMode> {
+        Binding(get: { model.project.style.bgMode }, set: { model.project.style.selectBackground($0) })
+    }
+
+    private func presetGrid(_ presets: [BackgroundPreset], apply: @escaping (BackgroundPreset) -> Void) -> some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 8) {
+            ForEach(presets) { p in
+                Button { apply(p) } label: {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(LinearGradient(colors: [p.c1.color, p.c2.color], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(height: 30)
                 }
+                .buttonStyle(.plain)
+                .help(p.name)
             }
         }
     }
