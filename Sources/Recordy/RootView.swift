@@ -102,6 +102,8 @@ struct HomeView: View {
             }
             .frame(width: 400)
             .onChange(of: perms.screenOK) { _, ok in if ok { state.refreshDevices() } }
+            .onChange(of: perms.isGranted(.camera)) { _, _ in state.refreshDevices() }
+            .onChange(of: perms.isGranted(.mic)) { _, _ in state.refreshDevices() }
             .onChange(of: state.startCorner) { _, _ in state.applyTestLayout() }
             .onChange(of: state.startShape) { _, _ in state.applyTestLayout() }
 

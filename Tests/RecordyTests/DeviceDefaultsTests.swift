@@ -167,6 +167,20 @@ struct DeviceDefaultsTests {
         #expect(pick(nil, [], denied: true) == "")
     }
 
+    /*
+      Scenario: A saved device is restored after access is granted again
+        Given the user chose an external microphone
+        And microphone access was denied and the list of devices was refreshed
+        When microphone access is granted and the list of devices is refreshed
+        Then the external microphone is selected again
+    */
+    @Test("A saved device is restored after access is granted again")
+    func savedDeviceRestoredAfterRegrant() {
+        let all = [externalMic, macMic]
+        #expect(pick(externalMic.id, all, denied: true) == "")
+        #expect(pick(externalMic.id, all) == externalMic.id)
+    }
+
     private let main: CGDirectDisplayID = 1
     private let external: CGDirectDisplayID = 5
     private let other: CGDirectDisplayID = 9

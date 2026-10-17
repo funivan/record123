@@ -15,8 +15,8 @@ final class AppState: ObservableObject {
     @Published var cameras: [AVCaptureDevice] = []
     @Published var mics: [AVCaptureDevice] = []
     @Published var selectedDisplay: CGDirectDisplayID = CGMainDisplayID() { didSet { syncRegionFrame() } }
-    @Published var selectedCamera: String { didSet { UserDefaults.standard.set(selectedCamera, forKey: "camera") } }
-    @Published var selectedMic: String { didSet { UserDefaults.standard.set(selectedMic, forKey: "mic") } }
+    @Published var selectedCamera: String { didSet { if !Self.accessDenied(.video) { UserDefaults.standard.set(selectedCamera, forKey: "camera") } } }
+    @Published var selectedMic: String { didSet { if !Self.accessDenied(.audio) { UserDefaults.standard.set(selectedMic, forKey: "mic") } } }
     @Published var systemAudio: Bool { didSet { UserDefaults.standard.set(systemAudio, forKey: "sysAudio") } }
     @Published var captureArea: Bool {
         didSet { syncRegionFrame() }
@@ -139,6 +139,11 @@ final class AppState: ObservableObject {
         DeviceOption(id: d.uniqueID, builtIn: d.transportType == Int32(bitPattern: kAudioDeviceTransportTypeBuiltIn))
     }
 
+    private func selectedOrMainDisplay() -> SCDisplay? {
+        guard let id = DeviceDefaults.display(current: selectedDisplay, available: displays.map(\.displayID), main: CGMainDisplayID()) else { return nil }
+        return displays.first(where: { $0.displayID == id })
+    }
+
     private static func accessDenied(_ type: AVMediaType) -> Bool {
         let status = AVCaptureDevice.authorizationStatus(for: type)
         return status == .denied || status == .restricted
@@ -169,7 +174,7 @@ final class AppState: ObservableObject {
 
     func chooseArea() {
         Task {
-            guard let display = displays.first(where: { $0.displayID == selectedDisplay }) ?? displays.first,
+            guard let display = selectedOrMainDisplay(),
                   let screen = nsScreen(display.displayID) else { error = "No display available"; return }
             let initial = region?.displayID == display.displayID ? region?.rect : nil
             regionFrame.hide()
@@ -305,7 +310,7 @@ final class AppState: ObservableObject {
         usingMic = !selectedMic.isEmpty
         if usingCamera, !(await AVCaptureDevice.requestAccess(for: .video)) { error = "Camera access denied"; return }
         if usingMic, !(await AVCaptureDevice.requestAccess(for: .audio)) { error = "Microphone access denied"; return }
-        guard let display = displays.first(where: { $0.displayID == selectedDisplay }) ?? displays.first else {
+        guard let display = selectedOrMainDisplay() else {
             error = "No display available"; return
         }
         let screen = nsScreen(display.displayID) ?? NSScreen.main!
