@@ -280,8 +280,6 @@ struct InspectorView: View {
 
     var zoom: some View {
         Section_(title: "Zoom", icon: "plus.magnifyingglass") {
-            LabeledSlider(label: "Default zoom", value: style.zoomLevel, range: 1.2...4) { String(format: "%.1f×", $0) }
-            LabeledSlider(label: "Default ease", value: style.zoomDuration, range: 0.2...2) { String(format: "%.1fs", $0) }
             LabeledSlider(label: "Cursor smoothing", value: style.cursorSmoothing, range: 0...1) { String(format: "%.2f", $0) }
             HStack {
                 Text("Zoom steps").font(.callout.bold())
@@ -303,8 +301,6 @@ struct InspectorView: View {
                             .buttonStyle(.borderless)
                     }
                     if selected {
-                        LabeledSlider(label: "Start", value: bind.start, range: 0...max(g.end - 0.3, 0.3)) { formatTime($0) }
-                        LabeledSlider(label: "End", value: bind.end, range: (g.start + 0.3)...max(model.project.duration, g.start + 0.31)) { formatTime($0) }
                         LabeledSlider(label: "Scale", value: bind.scale, range: 1.1...5) { String(format: "%.1f×", $0) }
                         LabeledSlider(label: "Fade in", value: bind.easeIn, range: 0.1...2) { String(format: "%.1fs", $0) }
                         LabeledSlider(label: "Fade out", value: bind.easeOut, range: 0.1...2) { String(format: "%.1fs", $0) }
