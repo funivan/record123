@@ -31,9 +31,9 @@ struct LabeledSlider: View {
 }
 
 enum InspectorSection: String, OrderedPanel {
-    case layout, background, camera, zoom, audio, trim
+    case layout, background, camera, zoom, audio
 
-    static let defaultOrder: [InspectorSection] = [.layout, .zoom, .background, .camera, .audio, .trim]
+    static let defaultOrder: [InspectorSection] = [.layout, .zoom, .background, .camera, .audio]
 
     var title: String {
         switch self {
@@ -42,7 +42,6 @@ enum InspectorSection: String, OrderedPanel {
         case .camera: return "Camera"
         case .zoom: return "Zoom"
         case .audio: return "Audio"
-        case .trim: return "Trim"
         }
     }
 
@@ -53,7 +52,6 @@ enum InspectorSection: String, OrderedPanel {
         case .camera: return "video.fill"
         case .zoom: return "plus.magnifyingglass"
         case .audio: return "waveform"
-        case .trim: return "scissors"
         }
     }
 }
@@ -91,7 +89,6 @@ struct InspectorView: View {
         case .camera: if model.project.cameraFile != nil { camera }
         case .zoom: zoom
         case .audio: audio
-        case .trim: trim
         }
     }
 
@@ -375,26 +372,6 @@ struct InspectorView: View {
             }
             if (model.project.audioClips ?? []).isEmpty {
                 Text("No audio in this recording. Add music or record a voice-over.").font(.caption).foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    var trim: some View {
-        Section_(title: "Trim", icon: "scissors") {
-            HStack {
-                Text("Start"); Spacer()
-                Text(formatTime(model.project.trimStart)).monospacedDigit()
-                Button("Set to playhead") { model.setTrimStart(model.time); model.commitTrim() }
-            }
-            HStack {
-                Text("End"); Spacer()
-                Text(formatTime(model.project.trimEnd)).monospacedDigit()
-                Button("Set to playhead") { model.setTrimEnd(model.time); model.commitTrim() }
-            }
-            Button("Reset trim") {
-                model.project.trimStart = 0
-                model.project.trimEnd = model.project.duration
-                model.commitTrim()
             }
         }
     }
