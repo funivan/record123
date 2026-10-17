@@ -275,6 +275,16 @@ struct InspectorView: View {
         })
     }
 
+    private func fadeBinding(_ g: Binding<ZoomSegment>, _ own: WritableKeyPath<ZoomSegment, Double>, other: KeyPath<ZoomSegment, Double>) -> Binding<Double> {
+        Binding(
+            get: { g.wrappedValue[keyPath: own] },
+            set: { v in
+                let limit = max(0.1, g.wrappedValue.length - g.wrappedValue[keyPath: other])
+                let next = min(v, limit)
+                if next != g.wrappedValue[keyPath: own] { g.wrappedValue[keyPath: own] = next }
+            })
+    }
+
     var zoom: some View {
         Section_(title: "Zoom", icon: "plus.magnifyingglass") {
             LabeledSlider(label: "Cursor smoothing", value: style.cursorSmoothing, range: 0...1) { String(format: "%.2f", $0) }
@@ -299,8 +309,8 @@ struct InspectorView: View {
                     }
                     if selected {
                         LabeledSlider(label: "Scale", value: bind.scale, range: 1.1...5) { String(format: "%.1f×", $0) }
-                        LabeledSlider(label: "Fade in", value: bind.easeIn, range: 0.1...2) { String(format: "%.1fs", $0) }
-                        LabeledSlider(label: "Fade out", value: bind.easeOut, range: 0.1...2) { String(format: "%.1fs", $0) }
+                        LabeledSlider(label: "Fade in", value: fadeBinding(bind, \.easeIn, other: \.easeOut), range: 0.1...max(0.1, g.length)) { String(format: "%.1fs", $0) }
+                        LabeledSlider(label: "Fade out", value: fadeBinding(bind, \.easeOut, other: \.easeIn), range: 0.1...max(0.1, g.length)) { String(format: "%.1fs", $0) }
                         Toggle("Follow cursor", isOn: bind.follow)
                         Button {
                             model.pickingFocus.toggle()

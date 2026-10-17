@@ -14,7 +14,7 @@ import CoreGraphics
 
     Rules: the main display is recorded by default, the MacBook camera and
     microphone are used by default, a choice made before is respected, denied
-    access selects nothing, and system audio is off by default.
+    access selects nothing, and system audio is on by default.
 */
 struct DeviceDefaultsTests {
     private let iphoneMic = DeviceOption(id: "0F5C2A11-iPhone-Continuity-Mic", builtIn: false)
@@ -167,6 +167,20 @@ struct DeviceDefaultsTests {
         #expect(pick(nil, [], denied: true) == "")
     }
 
+    /*
+      Scenario: A saved device is restored after access is granted again
+        Given the user chose an external microphone
+        And microphone access was denied and the list of devices was refreshed
+        When microphone access is granted and the list of devices is refreshed
+        Then the external microphone is selected again
+    */
+    @Test("A saved device is restored after access is granted again")
+    func savedDeviceRestoredAfterRegrant() {
+        let all = [externalMic, macMic]
+        #expect(pick(externalMic.id, all, denied: true) == "")
+        #expect(pick(externalMic.id, all) == externalMic.id)
+    }
+
     private let main: CGDirectDisplayID = 1
     private let external: CGDirectDisplayID = 5
     private let other: CGDirectDisplayID = 9
@@ -226,9 +240,9 @@ struct DeviceDefaultsTests {
         And "Full display" is selected
 
       @ui
-      Scenario: System audio stays off
+      Scenario: System audio is on
         Given the user never changed "Record system audio"
         When the app starts
-        Then "Record system audio" is off
+        Then "Record system audio" is on
     */
 }

@@ -59,7 +59,7 @@ struct EditorView: View {
         Color.clear
             .frame(width: 6)
             .contentShape(Rectangle())
-            .onHover { if $0 { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() } }
+            .hoverCursor(.resizeLeftRight)
             .gesture(DragGesture(minimumDistance: 1, coordinateSpace: .global).onChanged { v in
                 if dragStartWidth == nil { dragStartWidth = inspectorWidth }
                 inspectorWidth = min(440, max(300, (dragStartWidth ?? inspectorWidth) - v.translation.width))
@@ -195,7 +195,7 @@ struct TimelineView: View {
                         RoundedRectangle(cornerRadius: 5).fill(Theme.signal.opacity(sel ? 0.95 : 0.6))
                         Text(String(format: "%.1f×", g.scale)).font(.system(size: 9, weight: .bold)).foregroundStyle(Theme.onAccent)
                         HStack {
-                            Rectangle().fill(Color.white.opacity(0.9)).frame(width: 3)
+                            Rectangle().fill(Color.white.opacity(0.9)).frame(width: 3).hoverCursor(.resizeLeftRight, grab: 4)
                                 .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("tl")).onChanged { v in
                                     model.selectedZoom = g.id; model.selectedCamera = nil
                                     if let i = model.project.zoomSegments?.firstIndex(where: { $0.id == g.id }) {
@@ -203,7 +203,7 @@ struct TimelineView: View {
                                     }
                                 })
                             Spacer()
-                            Rectangle().fill(Color.white.opacity(0.9)).frame(width: 3)
+                            Rectangle().fill(Color.white.opacity(0.9)).frame(width: 3).hoverCursor(.resizeLeftRight, grab: 4)
                                 .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("tl")).onChanged { v in
                                     model.selectedZoom = g.id; model.selectedCamera = nil
                                     if let i = model.project.zoomSegments?.firstIndex(where: { $0.id == g.id }) {
@@ -213,6 +213,7 @@ struct TimelineView: View {
                         }
                     }
                     .frame(width: wBar, height: 18)
+                    .hoverCursor(.openHand)
                     .offset(x: x(g.start), y: 82)
                     .gesture(DragGesture(minimumDistance: 2, coordinateSpace: .named("tl")).onChanged { v in
                         model.selectedZoom = g.id; model.selectedCamera = nil
@@ -232,6 +233,7 @@ struct TimelineView: View {
                     Text("Camera").font(.system(size: 9)).foregroundStyle(.secondary).offset(x: 2, y: 100)
                     ForEach(model.project.cameraKeys) { k in
                         Marker(color: Theme.camera, selected: model.selectedCamera == k.id, label: k.visible ? String(k.shape.label.prefix(1)) : "×")
+                            .hoverCursor(.openHand)
                             .offset(x: x(k.time) - 14, y: 112)
                             .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("tl")).onChanged { v in
                                 model.selectedCamera = k.id; model.selectedZoom = nil
@@ -252,11 +254,11 @@ struct TimelineView: View {
                 Color.clear.contentShape(Rectangle()).frame(height: 44).offset(y: 22)
                     .gesture(DragGesture(minimumDistance: 0).onChanged { v in model.seek(to: t(v.location.x)) })
 
-                RoundedRectangle(cornerRadius: 3).fill(Color.white).frame(width: handleW, height: 44)
+                RoundedRectangle(cornerRadius: 3).fill(Color.white).frame(width: handleW, height: 44).hoverCursor(.resizeLeftRight)
                     .offset(x: x(model.project.trimStart) - handleW, y: 22)
                     .gesture(DragGesture(coordinateSpace: .named("tl")).onChanged { v in model.setTrimStart(t(v.location.x + handleW / 2)) }
                         .onEnded { _ in model.commitTrim() })
-                RoundedRectangle(cornerRadius: 3).fill(Color.white).frame(width: handleW, height: 44)
+                RoundedRectangle(cornerRadius: 3).fill(Color.white).frame(width: handleW, height: 44).hoverCursor(.resizeLeftRight)
                     .offset(x: x(model.project.trimEnd), y: 22)
                     .gesture(DragGesture(coordinateSpace: .named("tl")).onChanged { v in model.setTrimEnd(t(v.location.x - handleW / 2)) }
                         .onEnded { _ in model.commitTrim() })
@@ -289,7 +291,7 @@ struct TimelineView: View {
             .padding(.leading, 7)
             .allowsHitTesting(false)
             HStack {
-                Rectangle().fill(Color.white.opacity(sel ? 0.95 : 0.5)).frame(width: 4)
+                Rectangle().fill(Color.white.opacity(sel ? 0.95 : 0.5)).frame(width: 4).hoverCursor(.resizeLeftRight, grab: 3)
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("tl")).onChanged { v in
                         model.selectedAudio = c.id
                         let base = audioDragBase ?? c
@@ -298,7 +300,7 @@ struct TimelineView: View {
                         update { $0.start = ns; $0.srcStart = base.srcStart + (ns - base.start); $0.duration = base.end - ns }
                     }.onEnded { _ in audioDragBase = nil; model.commitAudio() })
                 Spacer()
-                Rectangle().fill(Color.white.opacity(sel ? 0.95 : 0.5)).frame(width: 4)
+                Rectangle().fill(Color.white.opacity(sel ? 0.95 : 0.5)).frame(width: 4).hoverCursor(.resizeLeftRight, grab: 3)
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("tl")).onChanged { v in
                         model.selectedAudio = c.id
                         let base = audioDragBase ?? c
@@ -310,6 +312,7 @@ struct TimelineView: View {
         }
         .frame(width: wBar, height: 26)
         .opacity(c.muted ? 0.5 : 1)
+        .hoverCursor(.openHand)
         .offset(x: x(c.start), y: TimelineView.audioTop + CGFloat(lane) * TimelineView.laneH)
         .gesture(DragGesture(minimumDistance: 3, coordinateSpace: .named("tl")).onChanged { v in
             model.selectedAudio = c.id; model.selectedZoom = nil; model.selectedCamera = nil
@@ -419,5 +422,30 @@ struct FocusPickerLayer: View {
                 .padding(.top, 10)
             }
         }
+    }
+}
+
+private struct HoverCursor: ViewModifier {
+    let cursor: NSCursor
+    let grab: CGFloat
+    @State private var inside = false
+
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, grab)
+            .contentShape(Rectangle())
+            .padding(.horizontal, -grab)
+            .onHover { hovering in
+                guard hovering != inside else { return }
+                inside = hovering
+                if hovering { cursor.push() } else { NSCursor.pop() }
+            }
+            .onDisappear { if inside { inside = false; NSCursor.pop() } }
+    }
+}
+
+extension View {
+    func hoverCursor(_ cursor: NSCursor, grab: CGFloat = 0) -> some View {
+        modifier(HoverCursor(cursor: cursor, grab: grab))
     }
 }

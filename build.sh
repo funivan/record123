@@ -3,6 +3,10 @@
 #   ./build.sh            local build (host arch, local signing identity)
 #   ./build.sh --full     local build, quit running app, relaunch
 #   ./build.sh --release  universal build, Developer ID + hardened runtime, notarize, zip
+#   ./build.sh -h|--help  show this help
+#   ./build.sh --use-default       also wipe saved settings (devices, theme, style, area) so the app starts with defaults
+#   ./build.sh --reset-permission  also reset Screen Recording, Camera and Microphone permissions
+#   The two flags combine with each other and with --full; either one quits and relaunches the app.
 #
 # Release env:
 #   SIGN_ID         Developer ID Application identity (default: first one found in keychain), "-" for ad-hoc
@@ -12,14 +16,33 @@ set -e
 cd "$(dirname "$0")"
 FULL=0
 RELEASE=0
-[[ "$1" == "--full" ]] && FULL=1
-[[ "$1" == "--release" ]] && RELEASE=1
+USE_DEFAULT=0
+RESET_PERMISSION=0
+for arg in "$@"; do
+    case $arg in
+        -h|--help) sed -n '2,/^set -e/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --full) FULL=1 ;;
+        --release) RELEASE=1 ;;
+        --use-default) USE_DEFAULT=1; FULL=1 ;;
+        --reset-permission) RESET_PERMISSION=1; FULL=1 ;;
+        *) echo "Unknown option: $arg"; exit 1 ;;
+    esac
+done
+BUNDLE_ID=com.funivan.recordy
 VERSION=${VERSION:-1.0}
 BUILD=${BUILD:-1}
 
 if (( FULL )); then
     pkill -x Recordy || true
     while pgrep -x Recordy >/dev/null; do sleep 0.2; done
+fi
+
+if (( USE_DEFAULT )); then
+    defaults delete $BUNDLE_ID 2>/dev/null || true
+    echo "Saved settings reset"
+fi
+if (( RESET_PERMISSION )); then
+    tccutil reset All $BUNDLE_ID
 fi
 
 if (( RELEASE )); then

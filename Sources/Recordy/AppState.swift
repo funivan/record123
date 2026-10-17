@@ -15,8 +15,8 @@ final class AppState: ObservableObject {
     @Published var cameras: [AVCaptureDevice] = []
     @Published var mics: [AVCaptureDevice] = []
     @Published var selectedDisplay: CGDirectDisplayID = CGMainDisplayID() { didSet { syncRegionFrame() } }
-    @Published var selectedCamera: String { didSet { UserDefaults.standard.set(selectedCamera, forKey: "camera") } }
-    @Published var selectedMic: String { didSet { UserDefaults.standard.set(selectedMic, forKey: "mic") } }
+    @Published var selectedCamera: String { didSet { if !applyingDefaults, !Self.accessDenied(.video) { UserDefaults.standard.set(selectedCamera, forKey: "camera") } } }
+    @Published var selectedMic: String { didSet { if !applyingDefaults, !Self.accessDenied(.audio) { UserDefaults.standard.set(selectedMic, forKey: "mic") } } }
     @Published var systemAudio: Bool { didSet { UserDefaults.standard.set(systemAudio, forKey: "sysAudio") } }
     @Published var captureArea: Bool {
         didSet { syncRegionFrame() }
@@ -70,11 +70,12 @@ final class AppState: ObservableObject {
     private var usingMic = false
     private var hiddenWindows: [NSWindow] = []
     private var lastDraftSave = 0.0
+    private var applyingDefaults = false
 
     init() {
         selectedCamera = UserDefaults.standard.string(forKey: "camera") ?? ""
         selectedMic = UserDefaults.standard.string(forKey: "mic") ?? ""
-        systemAudio = UserDefaults.standard.bool(forKey: "sysAudio")
+        systemAudio = UserDefaults.standard.object(forKey: "sysAudio") as? Bool ?? true
         captureArea = false
         cameraBlur = DefaultStyle.load().cameraBlur
         BlurredPreview.shared.enabled = cameraBlur
@@ -112,13 +113,15 @@ final class AppState: ObservableObject {
     var isBusy: Bool { phase != .idle }
 
     func refreshDevices() {
-        cameras = Devices.cameras()
-        mics = Devices.microphones()
+        cameras = Self.builtInFirst(Devices.cameras())
+        mics = Self.builtInFirst(Devices.microphones())
         let camera = DeviceDefaults.selection(
             stored: UserDefaults.standard.string(forKey: "camera"),
             available: cameras.map(Self.option),
             systemDefault: AVCaptureDevice.default(for: .video)?.uniqueID,
             accessDenied: Self.accessDenied(.video))
+        applyingDefaults = true
+        defer { applyingDefaults = false }
         if camera != selectedCamera { selectedCamera = camera }
         let mic = DeviceDefaults.selection(
             stored: UserDefaults.standard.string(forKey: "mic"),
@@ -135,8 +138,17 @@ final class AppState: ObservableObject {
         }
     }
 
+    private static func builtInFirst(_ devices: [AVCaptureDevice]) -> [AVCaptureDevice] {
+        devices.filter { option($0).builtIn } + devices.filter { !option($0).builtIn }
+    }
+
     private static func option(_ d: AVCaptureDevice) -> DeviceOption {
         DeviceOption(id: d.uniqueID, builtIn: d.transportType == Int32(bitPattern: kAudioDeviceTransportTypeBuiltIn))
+    }
+
+    private func selectedOrMainDisplay() -> SCDisplay? {
+        guard let id = DeviceDefaults.display(current: selectedDisplay, available: displays.map(\.displayID), main: CGMainDisplayID()) else { return nil }
+        return displays.first(where: { $0.displayID == id })
     }
 
     private static func accessDenied(_ type: AVMediaType) -> Bool {
@@ -169,7 +181,7 @@ final class AppState: ObservableObject {
 
     func chooseArea() {
         Task {
-            guard let display = displays.first(where: { $0.displayID == selectedDisplay }) ?? displays.first,
+            guard let display = selectedOrMainDisplay(),
                   let screen = nsScreen(display.displayID) else { error = "No display available"; return }
             let initial = region?.displayID == display.displayID ? region?.rect : nil
             regionFrame.hide()
@@ -305,7 +317,7 @@ final class AppState: ObservableObject {
         usingMic = !selectedMic.isEmpty
         if usingCamera, !(await AVCaptureDevice.requestAccess(for: .video)) { error = "Camera access denied"; return }
         if usingMic, !(await AVCaptureDevice.requestAccess(for: .audio)) { error = "Microphone access denied"; return }
-        guard let display = displays.first(where: { $0.displayID == selectedDisplay }) ?? displays.first else {
+        guard let display = selectedOrMainDisplay() else {
             error = "No display available"; return
         }
         let screen = nsScreen(display.displayID) ?? NSScreen.main!
