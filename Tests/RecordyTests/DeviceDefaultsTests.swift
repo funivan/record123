@@ -14,7 +14,7 @@ import CoreGraphics
 
     Rules: the main display is recorded by default, the MacBook camera and
     microphone are used by default, a choice made before is respected, denied
-    access selects nothing, and system audio is off by default.
+    access selects nothing, and system audio is on by default.
 */
 struct DeviceDefaultsTests {
     private let iphoneMic = DeviceOption(id: "0F5C2A11-iPhone-Continuity-Mic", builtIn: false)
@@ -240,9 +240,9 @@ struct DeviceDefaultsTests {
         And "Full display" is selected
 
       @ui
-      Scenario: System audio stays off
+      Scenario: System audio is on
         Given the user never changed "Record system audio"
         When the app starts
-        Then "Record system audio" is off
+        Then "Record system audio" is on
     */
 }

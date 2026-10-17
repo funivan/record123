@@ -222,6 +222,7 @@ struct ZoomSegment: Codable, Identifiable, Equatable {
     var scale: Double
     var easeIn = 0.7
     var easeOut = 0.7
+    var length: Double { end - start }
     var follow = true
     var fx = 0.5
     var fy = 0.5

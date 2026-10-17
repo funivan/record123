@@ -75,7 +75,7 @@ final class AppState: ObservableObject {
     init() {
         selectedCamera = UserDefaults.standard.string(forKey: "camera") ?? ""
         selectedMic = UserDefaults.standard.string(forKey: "mic") ?? ""
-        systemAudio = UserDefaults.standard.bool(forKey: "sysAudio")
+        systemAudio = UserDefaults.standard.object(forKey: "sysAudio") as? Bool ?? true
         captureArea = false
         cameraBlur = DefaultStyle.load().cameraBlur
         BlurredPreview.shared.enabled = cameraBlur

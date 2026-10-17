@@ -123,6 +123,8 @@ git clone git@github.com:funivan/recordy.git
 cd recordy
 ./build.sh          # build Recordy.app for the host architecture
 ./build.sh --full   # build, quit the running app and relaunch it
+./build.sh --use-default       # also wipe saved settings, so the app starts with defaults
+./build.sh --reset-permission  # also reset Screen Recording, Camera and Microphone permissions
 ```
 
 Local builds are signed with a `Recordy Local Signing` identity when one exists in the keychain, otherwise ad-hoc. A stable identity keeps macOS privacy permissions across rebuilds.
