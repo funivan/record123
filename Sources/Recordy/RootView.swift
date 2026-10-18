@@ -194,7 +194,6 @@ struct HomeView: View {
                     LevelBar(level: state.testing ? state.micLevel : 0)
                 }
             }
-            Toggle("Record system audio", isOn: $state.systemAudio)
         }
     }
 

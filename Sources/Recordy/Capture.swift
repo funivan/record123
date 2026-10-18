@@ -18,7 +18,7 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
     var onStreamError: ((Error) -> Void)?
     var writerError: Error? { writer?.status == .failed ? writer?.error : nil }
 
-    func start(display: SCDisplay, region: CGRect?, excludingWindowIDs: [CGWindowID], url: URL, systemAudio: Bool, scale: CGFloat) async throws {
+    func start(display: SCDisplay, region: CGRect?, excludingWindowIDs: [CGWindowID], url: URL, scale: CGFloat) async throws {
         queue.sync {
             firstPTS = nil
             lastVideoPTS = .zero
@@ -39,12 +39,10 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
         cfg.pixelFormat = kCVPixelFormatType_32BGRA
         cfg.showsCursor = UserDefaults.standard.object(forKey: "showCursor") as? Bool ?? true
         cfg.queueDepth = 6
-        if systemAudio {
-            cfg.capturesAudio = true
-            cfg.sampleRate = 48000
-            cfg.channelCount = 2
-            cfg.excludesCurrentProcessAudio = true
-        }
+        cfg.capturesAudio = true
+        cfg.sampleRate = 48000
+        cfg.channelCount = 2
+        cfg.excludesCurrentProcessAudio = true
         pixelSize = CGSize(width: w, height: h)
 
         let writer = try AVAssetWriter(url: url, fileType: .mov)
@@ -56,14 +54,12 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
         ])
         vi.expectsMediaDataInRealTime = true
         writer.add(vi)
-        if systemAudio {
-            let ai = AVAssetWriterInput(mediaType: .audio, outputSettings: [
-                AVFormatIDKey: kAudioFormatMPEG4AAC, AVNumberOfChannelsKey: 2, AVSampleRateKey: 48000, AVEncoderBitRateKey: 160_000,
-            ])
-            ai.expectsMediaDataInRealTime = true
-            writer.add(ai)
-            audioInput = ai
-        }
+        let ai = AVAssetWriterInput(mediaType: .audio, outputSettings: [
+            AVFormatIDKey: kAudioFormatMPEG4AAC, AVNumberOfChannelsKey: 2, AVSampleRateKey: 48000, AVEncoderBitRateKey: 160_000,
+        ])
+        ai.expectsMediaDataInRealTime = true
+        writer.add(ai)
+        audioInput = ai
         writer.movieFragmentInterval = CMTime(seconds: 4, preferredTimescale: 600)
         writer.startWriting()
         self.writer = writer
@@ -71,7 +67,7 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
 
         let s = SCStream(filter: filter, configuration: cfg, delegate: self)
         try s.addStreamOutput(self, type: .screen, sampleHandlerQueue: queue)
-        if systemAudio { try s.addStreamOutput(self, type: .audio, sampleHandlerQueue: queue) }
+        try s.addStreamOutput(self, type: .audio, sampleHandlerQueue: queue)
         try await s.startCapture()
         stream = s
     }

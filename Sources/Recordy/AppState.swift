@@ -17,7 +17,6 @@ final class AppState: ObservableObject {
     @Published var selectedDisplay: CGDirectDisplayID = CGMainDisplayID() { didSet { syncRegionFrame() } }
     @Published var selectedCamera: String { didSet { if !applyingDefaults, !Self.accessDenied(.video) { UserDefaults.standard.set(selectedCamera, forKey: "camera") } } }
     @Published var selectedMic: String { didSet { if !applyingDefaults, !Self.accessDenied(.audio) { UserDefaults.standard.set(selectedMic, forKey: "mic") } } }
-    @Published var systemAudio: Bool { didSet { UserDefaults.standard.set(systemAudio, forKey: "sysAudio") } }
     @Published var captureArea: Bool {
         didSet { syncRegionFrame() }
     }
@@ -75,7 +74,6 @@ final class AppState: ObservableObject {
     init() {
         selectedCamera = UserDefaults.standard.string(forKey: "camera") ?? ""
         selectedMic = UserDefaults.standard.string(forKey: "mic") ?? ""
-        systemAudio = UserDefaults.standard.object(forKey: "sysAudio") as? Bool ?? true
         captureArea = false
         cameraBlur = DefaultStyle.load().cameraBlur
         BlurredPreview.shared.enabled = cameraBlur
@@ -360,7 +358,7 @@ final class AppState: ObservableObject {
                 try micRec.start(device: dev, url: dir.appendingPathComponent("mic.m4a"))
             }
             try await screenRec.start(display: display, region: area, excludingWindowIDs: excluded, url: dir.appendingPathComponent("screen.mov"),
-                                      systemAudio: systemAudio, scale: screen.backingScaleFactor)
+                                      scale: screen.backingScaleFactor)
         } catch {
             await abort(error)
             return
