@@ -87,6 +87,27 @@ On first use macOS asks for:
 
 Grant them in **System Settings → Privacy & Security**, then restart Recordy.
 
+### Uninstall
+
+From a checkout of this repository, run as your normal user (not with `sudo`):
+
+```sh
+./scripts/uninstall.sh
+```
+
+This quits Recordy, resets privacy permissions for the current and legacy bundle IDs,
+removes its login item and LaunchServices registration, and deletes
+`/Applications/Recordy.app` along with its support files, preferences, caches and saved state.
+Recordings in `~/Movies/Recordy` are kept by default. To permanently delete them too:
+
+```sh
+./scripts/uninstall.sh --with-recordings
+```
+
+Deletion is permanent, not a move to Trash. The script lists remaining matching files
+for inspection without deleting them. Check any reported errors (for example, if the app
+cannot be removed due to permissions), then empty the Trash in Finder and restart your Mac.
+
 ## Hotkeys
 
 Global hotkeys use `⌃⌥⌘` plus a key:
@@ -145,6 +166,7 @@ Exports a saved project from `~/Movies/Recordy` without opening the UI.
 - `Casks`: Homebrew cask
 - `build.sh`: builds, signs and packages the app
 - `scripts/release.sh`: tags and pushes a release
+- `scripts/uninstall.sh`: removes the app and its data, optionally including recordings
 
 ## Contributing and releasing
 
