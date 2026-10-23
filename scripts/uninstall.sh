@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -u
+
+BUNDLE_ID="com.funivan.recordy"
+APP="/Applications/Recordy.app"
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+DELETE_RECORDINGS=0
+
+for arg in "$@"; do
+  case "$arg" in
+    --with-recordings) DELETE_RECORDINGS=1 ;;
+    -h|--help)
+      echo "Usage: $0 [--with-recordings]"
+      echo "Removes Recordy and its settings. Recordings are kept unless --with-recordings is used."
+      exit 0
+      ;;
+    *) echo "Unknown option: $arg" >&2; exit 1 ;;
+  esac
+done
+
+: "${HOME:?HOME must be set to uninstall Recordy}"
+
+killall Recordy 2>/dev/null
+
+tccutil reset All "$BUNDLE_ID"
+tccutil reset All "com.recordy.app" 2>/dev/null
+
+osascript -e 'tell application "System Events" to delete (every login item whose name is "Recordy")' 2>/dev/null
+
+"$LSREGISTER" -u "$APP" 2>/dev/null
+rm -rf "$APP"
+
+rm -rf "$HOME/Library/Application Support/Recordy"
+rm -f "$HOME/Library/Preferences/$BUNDLE_ID.plist"
+rm -rf "$HOME/Library/Caches/$BUNDLE_ID"
+rm -rf "$HOME/Library/Saved Application State/$BUNDLE_ID.savedState"
+rm -rf "$HOME/Library/HTTPStorages/$BUNDLE_ID"
+rm -rf "$HOME/Library/WebKit/$BUNDLE_ID"
+killall cfprefsd 2>/dev/null
+
+if [[ "$DELETE_RECORDINGS" -eq 1 ]]; then
+  rm -rf "$HOME/Movies/Recordy"
+else
+  echo "Kept recordings in ~/Movies/Recordy (use --with-recordings to delete)"
+fi
+
+echo "Remaining Recordy files:"
+find "$HOME/Library" /Library -iname "*recordy*" 2>/dev/null
+
+echo "Empty the Trash in Finder, then restart the Mac."
