@@ -20,7 +20,7 @@
   <circle cx="150" cy="180" r="24" fill="#fff"/>
   <g font-family="-apple-system, 'SF Pro Display', Helvetica, Arial, sans-serif">
     <text x="260" y="190" font-size="92" font-weight="800" fill="#fff">Record123</text>
-    <text x="264" y="244" font-size="30" fill="#e8e8ee">Record. Polish. Export. All on your Mac.</text>
+    <text x="264" y="244" font-size="30" fill="#e8e8ee">Simple advanced record app</text>
     <rect x="264" y="272" width="150" height="40" rx="20" fill="#d4f542"/>
     <text x="339" y="300" font-size="20" font-weight="700" fill="#1b1b1b" text-anchor="middle">Screen</text>
     <rect x="428" y="272" width="150" height="40" rx="20" fill="#ffffff" fill-opacity="0.14"/>

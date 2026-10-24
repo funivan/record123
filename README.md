@@ -11,7 +11,7 @@
 [![Homebrew](https://img.shields.io/badge/brew-cask-FBB040?style=for-the-badge&logo=homebrew&logoColor=white)](#homebrew)
 [![Stars](https://img.shields.io/github/stars/funivan/record123?style=for-the-badge&color=ff5a36)](https://github.com/funivan/record123/stargazers)
 
-**A native macOS screen recorder with a camera overlay, cursor zooms and a built-in editor.**
+**Simple advanced record app.**<br>A native macOS screen recorder with a camera overlay, cursor zooms and a built-in editor.
 <br>
 Record, polish and export in one app. No cloud account, no subscription, no upload.
 
