@@ -50,7 +50,7 @@ struct EditorView: View {
             }
         }
         .onKeyPress(.space) { model.togglePlay(); return .handled }
-        .alert("Recordy", isPresented: Binding(get: { model.loadError != nil }, set: { if !$0 { model.loadError = nil } })) {
+        .alert("Record123", isPresented: Binding(get: { model.loadError != nil }, set: { if !$0 { model.loadError = nil } })) {
             Button("OK") { model.loadError = nil }
         } message: { Text(model.loadError ?? "") }
     }

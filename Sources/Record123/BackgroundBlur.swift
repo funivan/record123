@@ -34,7 +34,7 @@ final class BlurredPreview: @unchecked Sendable {
     private let lock = NSLock()
     private var _enabled = false
     private var busy = false
-    private let queue = DispatchQueue(label: "recordy.blur.preview")
+    private let queue = DispatchQueue(label: "record123.blur.preview")
     private let blur = BackgroundBlur()
     private let ci = CIContext()
     private let layers = NSHashTable<CALayer>.weakObjects()

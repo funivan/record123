@@ -101,7 +101,7 @@ struct RecordingSettings: View {
                 Text("30 fps").tag(30); Text("60 fps").tag(60)
             }
             Toggle("Capture mouse cursor", isOn: $showCursor)
-            Text("Recordings are saved to ~/Movies/Recordy.").font(.caption).foregroundStyle(.secondary)
+            Text("Recordings are saved to ~/Movies/Record123.").font(.caption).foregroundStyle(.secondary)
             Section("Defaults") {
                 Button("Reset to defaults") {
                     countdown = 3
@@ -115,12 +115,12 @@ struct RecordingSettings: View {
             }
             Section("Permissions") {
                 Button("Reset permissions…") { confirmReset = true }
-                Text("Clears Screen Recording, Microphone and Camera access for Recordy and restarts the app. Use it if access is enabled but Recordy still says it is missing.")
+                Text("Clears Screen Recording, Microphone and Camera access for Record123 and restarts the app. Use it if access is enabled but Record123 still says it is missing.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
-        .confirmationDialog("Reset all Recordy permissions?", isPresented: $confirmReset) {
+        .confirmationDialog("Reset all Record123 permissions?", isPresented: $confirmReset) {
             Button("Reset and restart", role: .destructive) { PermissionsModel.resetAndRelaunch() }
             Button("Cancel", role: .cancel) {}
         }

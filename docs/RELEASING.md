@@ -7,8 +7,8 @@ flowchart LR
     tag[scripts/release.sh X.Y.Z] --> ci[GitHub Actions]
     ci --> build[build.sh --release]
     build --> rel[GitHub release zip]
-    rel --> cask[Casks/recordy.rb updated]
-    cask --> brew[brew upgrade --cask recordy]
+    rel --> cask[Casks/record123.rb updated]
+    cask --> brew[brew upgrade --cask record123]
 ```
 
 ## Cut a release
@@ -25,8 +25,8 @@ The script requires a clean `main` that matches `origin/main`.
 The [Release workflow](../.github/workflows/release.yml) then:
 
 1. Builds a universal (arm64 + x86_64) app with `./build.sh --release`
-2. Publishes `Recordy-<version>.zip` as a GitHub release
-3. Updates the version and checksum in [`Casks/recordy.rb`](../Casks/recordy.rb) on `main`
+2. Publishes `Record123-<version>.zip` as a GitHub release
+3. Updates the version and checksum in [`Casks/record123.rb`](../Casks/record123.rb) on `main`
 
 ## Signed and notarized build
 

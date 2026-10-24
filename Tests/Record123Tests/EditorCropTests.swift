@@ -1,7 +1,7 @@
 import Testing
 import Foundation
 import CoreGraphics
-@testable import Recordy
+@testable import Record123
 
 struct EditorCropTests {
     private func project(width: Int = 1920, height: Int = 1080, crop: CropRect? = nil) -> Project {
@@ -288,7 +288,7 @@ struct EditorCropTests {
 
     @Test("Given a project saved to disk, when it is opened again, then it is still cropped")
     func cropSurvivesDisk() throws {
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("recordy-crop-\(UUID().uuidString)")
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("record123-crop-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
         let crop = CropRect(x: 0, y: 0.25, w: 1, h: 0.75)
@@ -322,7 +322,7 @@ private extension Style {
 @MainActor
 struct EditorCropModelTests {
     private func makeModel(crop: CropRect? = nil) throws -> (EditorModel, URL) {
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("recordy-crop-model-\(UUID().uuidString)")
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("record123-crop-model-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         var p = Project(name: "t", duration: 10)
         p.trimEnd = 10

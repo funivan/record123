@@ -418,7 +418,7 @@ struct Project: Codable, Identifiable {
 
 enum Paths {
     static var root: URL {
-        let u = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordy")
+        let u = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask)[0].appendingPathComponent("Record123")
         try? FileManager.default.createDirectory(at: u, withIntermediateDirectories: true)
         return u
     }
@@ -476,7 +476,7 @@ enum ProjectIO {
 
 enum BackgroundImages {
     static var dir: URL {
-        let u = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordy/Backgrounds")
+        let u = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Record123/Backgrounds")
         try? FileManager.default.createDirectory(at: u, withIntermediateDirectories: true)
         return u
     }

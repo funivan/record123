@@ -17,7 +17,7 @@ enum ThemeKind: String, CaseIterable, Identifiable {
     var subtitle: String {
         switch self {
         case .system: return "Native macOS look. Follows light/dark and your accent colour."
-        case .signal: return "Ink black with signal orange. The Recordy signature."
+        case .signal: return "Ink black with signal orange. The Record123 signature."
         case .midnight: return "Deep blue-black with cool cyan. Clean and technical."
         case .tiles: return "Soft grey canvas, white tiles, vermilion and lime. Rounded widget look."
         case .planet: return "Peach gradient, cream tiles, orange and yellow accents. Clock dashboard look."

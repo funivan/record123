@@ -1,15 +1,15 @@
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="Recordy" width="100%">
+<img src="docs/assets/banner.svg" alt="Record123" width="100%">
 
 <br>
 
-[![Release](https://img.shields.io/github/v/release/funivan/recordy?style=for-the-badge&color=ff5a36&label=release)](https://github.com/funivan/recordy/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/funivan/recordy/total?style=for-the-badge&color=d4f542&labelColor=1b1b1b)](https://github.com/funivan/recordy/releases)
+[![Release](https://img.shields.io/github/v/release/funivan/record123?style=for-the-badge&color=ff5a36&label=release)](https://github.com/funivan/record123/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/funivan/record123/total?style=for-the-badge&color=d4f542&labelColor=1b1b1b)](https://github.com/funivan/record123/releases)
 [![macOS](https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&logo=apple&logoColor=white)](#requirements)
 [![Swift](https://img.shields.io/badge/Swift-5.9-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
 [![Homebrew](https://img.shields.io/badge/brew-cask-FBB040?style=for-the-badge&logo=homebrew&logoColor=white)](#homebrew)
-[![Stars](https://img.shields.io/github/stars/funivan/recordy?style=for-the-badge&color=ff5a36)](https://github.com/funivan/recordy/stargazers)
+[![Stars](https://img.shields.io/github/stars/funivan/record123?style=for-the-badge&color=ff5a36)](https://github.com/funivan/record123/stargazers)
 
 **A native macOS screen recorder with a camera overlay, cursor zooms and a built-in editor.**
 <br>
@@ -23,7 +23,7 @@ Record, polish and export in one app. No cloud account, no subscription, no uplo
 
 ## About
 
-Recordy is for demos, tutorials, bug reports and product walkthroughs that should look good without a video editing session. It captures your screen with ScreenCaptureKit, lets you tweak everything afterwards in a timeline editor, and exports a clean MP4 or MOV. Everything stays on your machine.
+Record123 is for demos, tutorials, bug reports and product walkthroughs that should look good without a video editing session. It captures your screen with ScreenCaptureKit, lets you tweak everything afterwards in a timeline editor, and exports a clean MP4 or MOV. Everything stays on your machine.
 
 ```mermaid
 flowchart LR
@@ -50,7 +50,7 @@ flowchart LR
 <sub>A few of the bundled wallpapers. Or bring your own image.</sub>
 </div>
 
-Recordings are saved to `~/Movies/Recordy`.
+Recordings are saved to `~/Movies/Record123`.
 
 ## Requirements
 
@@ -62,20 +62,20 @@ Recordings are saved to `~/Movies/Recordy`.
 ### Homebrew
 
 ```sh
-brew tap funivan/recordy https://github.com/funivan/recordy
-brew install --cask funivan/recordy/recordy
+brew tap funivan/record123 https://github.com/funivan/record123
+brew install --cask funivan/record123/record123
 ```
 
-Update with `brew upgrade --cask recordy`.
+Update with `brew upgrade --cask record123`.
 
 ### Manual
 
-Download `Recordy-<version>.zip` from [Releases](https://github.com/funivan/recordy/releases/latest), unzip it and move `Recordy.app` to `/Applications`.
+Download `Record123-<version>.zip` from [Releases](https://github.com/funivan/record123/releases/latest), unzip it and move `Record123.app` to `/Applications`.
 
 The app is not notarized, so on first launch macOS may block it. Clear the quarantine flag once:
 
 ```sh
-xattr -dr com.apple.quarantine /Applications/Recordy.app
+xattr -dr com.apple.quarantine /Applications/Record123.app
 ```
 
 ### Permissions
@@ -85,7 +85,7 @@ On first use macOS asks for:
 - **Screen Recording**: required to capture the screen
 - **Camera** and **Microphone**: only when you enable them
 
-Grant them in **System Settings → Privacy & Security**, then restart Recordy.
+Grant them in **System Settings → Privacy & Security**, then restart Record123.
 
 ### Uninstall
 
@@ -95,10 +95,10 @@ From a checkout of this repository, run as your normal user (not with `sudo`):
 ./scripts/uninstall.sh
 ```
 
-This quits Recordy, resets privacy permissions for the current and legacy bundle IDs,
+This quits Record123, resets privacy permissions for the current and legacy bundle IDs,
 removes its login item and LaunchServices registration, and deletes
-`/Applications/Recordy.app` along with its support files, preferences, caches and saved state.
-Recordings in `~/Movies/Recordy` are kept by default. To permanently delete them too:
+`/Applications/Record123.app` along with its support files, preferences, caches and saved state.
+Recordings in `~/Movies/Record123` are kept by default. To permanently delete them too:
 
 ```sh
 ./scripts/uninstall.sh --with-recordings
@@ -140,27 +140,27 @@ Global hotkeys use `⌃⌥⌘` plus a key:
 Requires Xcode command line tools with Swift 5.9 or later.
 
 ```sh
-git clone git@github.com:funivan/recordy.git
-cd recordy
-./build.sh          # build Recordy.app for the host architecture
+git clone git@github.com:funivan/record123.git
+cd record123
+./build.sh          # build Record123.app for the host architecture
 ./build.sh --full   # build, quit the running app and relaunch it
 ./build.sh --use-default       # also wipe saved settings, so the app starts with defaults
 ./build.sh --reset-permission  # also reset Screen Recording, Camera and Microphone permissions
 ```
 
-Local builds are signed with a `Recordy Local Signing` identity when one exists in the keychain, otherwise ad-hoc. A stable identity keeps macOS privacy permissions across rebuilds.
+Local builds are signed with a `Record123 Local Signing` identity when one exists in the keychain, otherwise ad-hoc. A stable identity keeps macOS privacy permissions across rebuilds.
 
 ### Command line
 
 ```sh
-Recordy.app/Contents/MacOS/Recordy --export <project-dir> <output.mp4>
+Record123.app/Contents/MacOS/Record123 --export <project-dir> <output.mp4>
 ```
 
-Exports a saved project from `~/Movies/Recordy` without opening the UI.
+Exports a saved project from `~/Movies/Record123` without opening the UI.
 
 ## Project layout
 
-- `Sources/Recordy`: SwiftUI app (capture, editor, renderer, exporter)
+- `Sources/Record123`: SwiftUI app (capture, editor, renderer, exporter)
 - `Resources`: app icon and bundled wallpapers
 - `tools`: scripts that generate the icon and wallpapers
 - `Casks`: Homebrew cask

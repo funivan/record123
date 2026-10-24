@@ -2,12 +2,12 @@ import Foundation
 import Testing
 
 /*
-Feature: Fully uninstall Recordy
+Feature: Fully uninstall Record123
   The app, settings and system registrations are removed.
   Recordings are kept unless their deletion is explicitly requested.
 */
 struct UninstallScriptTests {
-    private func uninstall(_ arguments: [String] = [], commandStatus: Int = 0, home: String = "/tmp/Recordy Test Home") throws -> (status: Int32, output: String) {
+    private func uninstall(_ arguments: [String] = [], commandStatus: Int = 0, home: String = "/tmp/Record123 Test Home") throws -> (status: Int32, output: String) {
         let script = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
             .appendingPathComponent("scripts/uninstall.sh")
@@ -40,8 +40,8 @@ struct UninstallScriptTests {
 
     /*
     Scenario: Uninstall removes app data but keeps recordings
-      Given Recordy has been installed
-      When the user uninstalls Recordy
+      Given Record123 has been installed
+      When the user uninstalls Record123
       Then the app, settings and registrations are removed
       And remaining matching files are reported without being deleted
       But recordings are kept
@@ -51,24 +51,24 @@ struct UninstallScriptTests {
         let result = try uninstall()
         #expect(result.status == 0)
         for command in [
-            "<killall><Recordy>",
-            "<tccutil><reset><All><com.funivan.recordy>",
-            "<tccutil><reset><All><com.recordy.app>",
-            #"<osascript><-e><tell application "System Events" to delete (every login item whose name is "Recordy")>"#,
-            "<lsregister><-u></Applications/Recordy.app>",
-            "<rm><-rf></Applications/Recordy.app>",
-            "<rm><-rf></tmp/Recordy Test Home/Library/Application Support/Recordy>",
-            "<rm><-f></tmp/Recordy Test Home/Library/Preferences/com.funivan.recordy.plist>",
-            "<rm><-rf></tmp/Recordy Test Home/Library/Caches/com.funivan.recordy>",
-            "<rm><-rf></tmp/Recordy Test Home/Library/Saved Application State/com.funivan.recordy.savedState>",
-            "<rm><-rf></tmp/Recordy Test Home/Library/HTTPStorages/com.funivan.recordy>",
-            "<rm><-rf></tmp/Recordy Test Home/Library/WebKit/com.funivan.recordy>",
+            "<killall><Record123>",
+            "<tccutil><reset><All><com.funivan.record123>",
+            "<tccutil><reset><All><com.record123.app>",
+            #"<osascript><-e><tell application "System Events" to delete (every login item whose name is "Record123")>"#,
+            "<lsregister><-u></Applications/Record123.app>",
+            "<rm><-rf></Applications/Record123.app>",
+            "<rm><-rf></tmp/Record123 Test Home/Library/Application Support/Record123>",
+            "<rm><-f></tmp/Record123 Test Home/Library/Preferences/com.funivan.record123.plist>",
+            "<rm><-rf></tmp/Record123 Test Home/Library/Caches/com.funivan.record123>",
+            "<rm><-rf></tmp/Record123 Test Home/Library/Saved Application State/com.funivan.record123.savedState>",
+            "<rm><-rf></tmp/Record123 Test Home/Library/HTTPStorages/com.funivan.record123>",
+            "<rm><-rf></tmp/Record123 Test Home/Library/WebKit/com.funivan.record123>",
             "<killall><cfprefsd>",
-            "<find></tmp/Recordy Test Home/Library></Library><-iname><*recordy*>"
+            "<find></tmp/Record123 Test Home/Library></Library><-iname><*record123*>"
         ] {
             #expect(result.output.contains(command))
         }
-        #expect(!result.output.contains("<rm><-rf></tmp/Recordy Test Home/Movies/Recordy>"))
+        #expect(!result.output.contains("<rm><-rf></tmp/Record123 Test Home/Movies/Record123>"))
         #expect(result.output.contains("Kept recordings"))
         #expect(result.output.contains("Empty the Trash in Finder, then restart the Mac."))
     }
@@ -84,14 +84,14 @@ struct UninstallScriptTests {
     func deletesRecordings() throws {
         let result = try uninstall(["--with-recordings"])
         #expect(result.status == 0)
-        #expect(result.output.contains("<rm><-rf></tmp/Recordy Test Home/Movies/Recordy>"))
+        #expect(result.output.contains("<rm><-rf></tmp/Record123 Test Home/Movies/Record123>"))
         #expect(!result.output.contains("Kept recordings"))
     }
 
     /*
     Scenario: Cleanup continues when system registrations are already absent
-      Given Recordy is not running and its system registrations are absent
-      When the user uninstalls Recordy
+      Given Record123 is not running and its system registrations are absent
+      When the user uninstalls Record123
       Then app data removal is still attempted
       And the final instructions are shown
     */
@@ -99,14 +99,14 @@ struct UninstallScriptTests {
     func continuesAfterFailures() throws {
         let result = try uninstall(commandStatus: 1)
         #expect(result.status == 0)
-        #expect(result.output.contains("<rm><-rf></Applications/Recordy.app>"))
+        #expect(result.output.contains("<rm><-rf></Applications/Record123.app>"))
         #expect(result.output.contains("<killall><cfprefsd>"))
         #expect(result.output.contains("Empty the Trash in Finder, then restart the Mac."))
     }
 
     /*
     Scenario: Help and invalid options never remove data
-      Given Recordy is installed
+      Given Record123 is installed
       When the user requests help or supplies an unknown option
       Then no cleanup commands run
     */
@@ -122,7 +122,7 @@ struct UninstallScriptTests {
     /*
     Scenario: An empty home directory prevents cleanup
       Given the home directory is not configured
-      When the user uninstalls Recordy
+      When the user uninstalls Record123
       Then no cleanup commands run
       And the uninstall reports an error
     */
@@ -137,8 +137,8 @@ struct UninstallScriptTests {
     /*
     @manual
     Scenario: macOS integrations are removed
-      Given Recordy has privacy permissions and a login item on macOS
-      When the user uninstalls Recordy
+      Given Record123 has privacy permissions and a login item on macOS
+      When the user uninstalls Record123
       Then its privacy permissions and login item are reset
       And its app is unregistered from LaunchServices
     */

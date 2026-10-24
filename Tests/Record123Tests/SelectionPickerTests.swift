@@ -1,6 +1,6 @@
 import Testing
 import AppKit
-@testable import Recordy
+@testable import Record123
 
 @MainActor
 /*

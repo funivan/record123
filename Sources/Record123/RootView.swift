@@ -16,7 +16,7 @@ struct RootView: View {
             }
         }
         .background { AppBackground().allowsHitTesting(false) }
-        .alert("Recordy", isPresented: Binding(get: { state.error != nil }, set: { if !$0 { state.error = nil } })) {
+        .alert("Record123", isPresented: Binding(get: { state.error != nil }, set: { if !$0 { state.error = nil } })) {
             Button("OK") { state.error = nil }
         } message: { Text(state.error ?? "") }
         .onAppear { state.refreshDevices() }
@@ -60,7 +60,7 @@ struct HomeView: View {
                     HStack(spacing: 12) {
                         Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 40, height: 40)
                         VStack(alignment: .leading, spacing: 0) {
-                            Text("Recordy").font(Theme.serif(26, italic: true))
+                            Text("Record123").font(Theme.serif(26, italic: true))
                             if Theme.p.surface != nil {
                                 Text("Screen · Camera · Signal").font(.system(size: 12, weight: .medium)).foregroundStyle(Theme.bone.opacity(0.5))
                             } else {

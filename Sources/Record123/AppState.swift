@@ -308,7 +308,7 @@ final class AppState: ObservableObject {
         error = nil
         if !CGPreflightScreenCaptureAccess() {
             CGRequestScreenCaptureAccess()
-            error = "Allow Screen Recording for Recordy in System Settings → Privacy & Security, then restart the app."
+            error = "Allow Screen Recording for Record123 in System Settings → Privacy & Security, then restart the app."
             return
         }
         usingCamera = !selectedCamera.isEmpty

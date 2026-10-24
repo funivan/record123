@@ -1,7 +1,7 @@
-# Recordy
+# Record123
 
 ## Specs
-- There is no `spec/` folder. Behaviour is specified as Gherkin in comments above the Swift Testing tests in `Tests/RecordyTests/`.
+- There is no `spec/` folder. Behaviour is specified as Gherkin in comments above the Swift Testing tests in `Tests/Record123Tests/`.
 - Write them in the style of https://cucumber.io/docs/gherkin/reference:
   - A `/* */` block comment (multi-line, never `//`) with the `Feature` and its description above each test struct, with `Background` and `Rule` where they help.
   - A `/* */` block comment starting with `Scenario: <name>` above each `@Test`, one `When` per scenario, then Given, When, Then with `And` and `But`.

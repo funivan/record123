@@ -1,11 +1,11 @@
 import SwiftUI
 
-struct RecordyApp: App {
+struct Record123App: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @StateObject private var state = AppState()
 
     var body: some Scene {
-        Window("Recordy", id: "main") {
+        Window("Record123", id: "main") {
             RootView()
                 .environmentObject(state)
                 .frame(minWidth: 1100, minHeight: 700)
@@ -62,7 +62,7 @@ struct MenuContent: View {
     var body: some View {
         Button(menuTitle) { state.toggleRecording() }
             .disabled(state.phase == .saving)
-        Button("Open Recordy") {
+        Button("Open Record123") {
             openWindow(id: "main")
             state.showMainWindow()
         }

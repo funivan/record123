@@ -40,11 +40,11 @@ if let i = args.firstIndex(of: "--snapshot"), args.count > i + 2 {
     let app = NSApplication.shared
     app.setActivationPolicy(.accessory)
     MainActor.assumeIsolated {
-        if let t = ProcessInfo.processInfo.environment["RECORDY_THEME"], let k = ThemeKind(rawValue: t) { ThemeStore.shared.kind = k }
+        if let t = ProcessInfo.processInfo.environment["RECORD123_THEME"], let k = ThemeKind(rawValue: t) { ThemeStore.shared.kind = k }
         let state = AppState()
         let dir = URL(fileURLWithPath: args[i + 1])
         if dir.path != "-" { state.open(dir) }
-        let settings = ProcessInfo.processInfo.environment["RECORDY_SETTINGS"] != nil
+        let settings = ProcessInfo.processInfo.environment["RECORD123_SETTINGS"] != nil
         let size = settings ? CGSize(width: 560, height: 460) : CGSize(width: 1280, height: 800)
         let root: AnyView = settings ? AnyView(SettingsView().environmentObject(state)) : AnyView(RootView().environmentObject(state))
         let host = NSHostingView(rootView: root.frame(width: size.width, height: size.height))
@@ -61,4 +61,4 @@ if let i = args.firstIndex(of: "--snapshot"), args.count > i + 2 {
     }
     exit(0)
 }
-RecordyApp.main()
+Record123App.main()

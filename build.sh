@@ -28,13 +28,13 @@ for arg in "$@"; do
         *) echo "Unknown option: $arg"; exit 1 ;;
     esac
 done
-BUNDLE_ID=com.funivan.recordy
+BUNDLE_ID=com.funivan.record123
 VERSION=${VERSION:-1.0}
 BUILD=${BUILD:-1}
 
 if (( FULL )); then
-    pkill -x Recordy || true
-    while pgrep -x Recordy >/dev/null; do sleep 0.2; done
+    pkill -x Record123 || true
+    while pgrep -x Record123 >/dev/null; do sleep 0.2; done
 fi
 
 if (( USE_DEFAULT )); then
@@ -47,17 +47,17 @@ fi
 
 if (( RELEASE )); then
     swift build -c release --arch arm64 --arch x86_64
-    BIN=$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/Recordy
+    BIN=$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/Record123
     [[ "$(lipo -archs $BIN)" == *x86_64*arm64* || "$(lipo -archs $BIN)" == *arm64*x86_64* ]] || { echo "Not a universal binary: $BIN"; exit 1; }
 else
     swift build -c release
-    BIN=.build/release/Recordy
+    BIN=.build/release/Record123
 fi
 
-APP=Recordy.app
+APP=Record123.app
 rm -rf $APP
 mkdir -p $APP/Contents/MacOS $APP/Contents/Resources
-cp $BIN $APP/Contents/MacOS/Recordy
+cp $BIN $APP/Contents/MacOS/Record123
 cp Resources/AppIcon.icns $APP/Contents/Resources/AppIcon.icns
 cp -R Resources/Wallpapers $APP/Contents/Resources/Wallpapers
 cat > $APP/Contents/Info.plist <<PLIST
@@ -66,11 +66,11 @@ cat > $APP/Contents/Info.plist <<PLIST
 <plist version="1.0"><dict>
 <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
 <key>CFBundleDevelopmentRegion</key><string>en</string>
-<key>CFBundleExecutable</key><string>Recordy</string>
-<key>CFBundleIdentifier</key><string>com.funivan.recordy</string>
+<key>CFBundleExecutable</key><string>Record123</string>
+<key>CFBundleIdentifier</key><string>com.funivan.record123</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
-<key>CFBundleName</key><string>Recordy</string>
-<key>CFBundleDisplayName</key><string>Recordy</string>
+<key>CFBundleName</key><string>Record123</string>
+<key>CFBundleDisplayName</key><string>Record123</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$VERSION</string>
 <key>CFBundleVersion</key><string>$BUILD</string>
@@ -80,22 +80,22 @@ cat > $APP/Contents/Info.plist <<PLIST
 <key>NSHighResolutionCapable</key><true/>
 <key>NSSupportsAutomaticTermination</key><false/>
 <key>NSSupportsSuddenTermination</key><false/>
-<key>NSCameraUsageDescription</key><string>Recordy records your camera as an overlay.</string>
+<key>NSCameraUsageDescription</key><string>Record123 records your camera as an overlay.</string>
 <key>NSCameraUseContinuityCameraDeviceType</key><true/>
-<key>NSMicrophoneUsageDescription</key><string>Recordy records your voice.</string>
-<key>NSScreenCaptureUsageDescription</key><string>Recordy records your screen.</string>
+<key>NSMicrophoneUsageDescription</key><string>Record123 records your voice.</string>
+<key>NSScreenCaptureUsageDescription</key><string>Record123 records your screen.</string>
 </dict></plist>
 PLIST
 plutil -lint $APP/Contents/Info.plist >/dev/null
 
-SIGN_OPTS=(--force --options runtime --entitlements Recordy.entitlements)
+SIGN_OPTS=(--force --options runtime --entitlements Record123.entitlements)
 if (( RELEASE )); then
     SIGN_ID=${SIGN_ID:-$(security find-identity -v -p codesigning | grep -o '"Developer ID Application:[^"]*"' | head -1 | tr -d '"')}
     [[ -z "$SIGN_ID" ]] && { echo "No Developer ID Application identity found; set SIGN_ID"; exit 1; }
     [[ "$SIGN_ID" != "-" ]] && SIGN_OPTS+=(--timestamp)
     codesign "${SIGN_OPTS[@]}" -s "$SIGN_ID" $APP
     codesign --verify --strict --verbose=2 $APP
-    ZIP=Recordy-$VERSION.zip
+    ZIP=Record123-$VERSION.zip
     rm -f $ZIP
     ditto -c -k --keepParent $APP $ZIP
     if [[ -n "$NOTARY_PROFILE" ]]; then
@@ -109,7 +109,7 @@ if (( RELEASE )); then
     fi
     echo "Built $ZIP"
 else
-    ID="Recordy Local Signing"
+    ID="Record123 Local Signing"
     if security find-identity -p codesigning | grep -q "$ID"; then
         codesign "${SIGN_OPTS[@]}" -s "$ID" $APP
     else

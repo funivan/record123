@@ -30,15 +30,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "Recordy-$VERSION.zip" \
-            --title "Recordy $VERSION" --generate-notes
+          gh release create "$GITHUB_REF_NAME" "Record123-$VERSION.zip" \
+            --title "Record123 $VERSION" --generate-notes
 
       - name: Update Homebrew cask
         run: |
-          SHA=$(shasum -a 256 "Recordy-$VERSION.zip" | cut -d' ' -f1)
+          SHA=$(shasum -a 256 "Record123-$VERSION.zip" | cut -d' ' -f1)
           git checkout main
-          sed -i '' -E "s/^  version \".*\"/  version \"$VERSION\"/" Casks/recordy.rb
-          sed -i '' -E "s/^  sha256 .*/  sha256 \"$SHA\"/" Casks/recordy.rb
+          sed -i '' -E "s/^  version \".*\"/  version \"$VERSION\"/" Casks/record123.rb
+          sed -i '' -E "s/^  sha256 .*/  sha256 \"$SHA\"/" Casks/record123.rb
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Update cask to $VERSION"

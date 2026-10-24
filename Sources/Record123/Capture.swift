@@ -10,7 +10,7 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
     private var writer: AVAssetWriter?
     private var videoInput: AVAssetWriterInput?
     private var audioInput: AVAssetWriterInput?
-    private let queue = DispatchQueue(label: "recordy.screen")
+    private let queue = DispatchQueue(label: "record123.screen")
     private(set) var firstPTS: Double?
     private var lastVideoPTS = CMTime.zero
     private var firstFrameWaiters: [CheckedContinuation<Double?, Never>] = []
@@ -135,7 +135,7 @@ final class ScreenRecorder: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
 final class CameraRecorder: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, @unchecked Sendable {
     let session = AVCaptureSession()
     private let output = AVCaptureVideoDataOutput()
-    private let queue = DispatchQueue(label: "recordy.camera")
+    private let queue = DispatchQueue(label: "record123.camera")
     private var writer: AVAssetWriter?
     private var input: AVAssetWriterInput?
     private var url: URL?
@@ -148,7 +148,7 @@ final class CameraRecorder: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
         session.inputs.forEach { session.removeInput($0) }
         if session.canSetSessionPreset(.hd1280x720) { session.sessionPreset = .hd1280x720 }
         let input = try AVCaptureDeviceInput(device: device)
-        guard session.canAddInput(input) else { throw NSError(domain: "recordy", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot use camera"]) }
+        guard session.canAddInput(input) else { throw NSError(domain: "record123", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot use camera"]) }
         session.addInput(input)
         if !session.outputs.contains(output) {
             output.alwaysDiscardsLateVideoFrames = false
@@ -159,7 +159,7 @@ final class CameraRecorder: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
         session.commitConfiguration()
     }
 
-    private let sessionQueue = DispatchQueue(label: "recordy.camera.session")
+    private let sessionQueue = DispatchQueue(label: "record123.camera.session")
 
     func startRunning() { sessionQueue.async { if !self.session.isRunning { self.session.startRunning() } } }
     func stopRunning() { sessionQueue.async { if self.session.isRunning { self.session.stopRunning() } } }
@@ -216,8 +216,8 @@ final class CameraRecorder: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
 final class MicRecorder: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate, @unchecked Sendable {
     private let session = AVCaptureSession()
     private let output = AVCaptureAudioDataOutput()
-    private let queue = DispatchQueue(label: "recordy.mic")
-    private let sessionQueue = DispatchQueue(label: "recordy.mic.session")
+    private let queue = DispatchQueue(label: "record123.mic")
+    private let sessionQueue = DispatchQueue(label: "record123.mic.session")
     private var writer: AVAssetWriter?
     private var input: AVAssetWriterInput?
     private var url: URL?
@@ -235,7 +235,7 @@ final class MicRecorder: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate,
         session.inputs.forEach { session.removeInput($0) }
         guard session.canAddInput(input) else {
             session.commitConfiguration()
-            throw NSError(domain: "recordy", code: 11, userInfo: [NSLocalizedDescriptionKey: "Cannot use microphone"])
+            throw NSError(domain: "record123", code: 11, userInfo: [NSLocalizedDescriptionKey: "Cannot use microphone"])
         }
         session.addInput(input)
         if !session.outputs.contains(output) {
@@ -292,7 +292,7 @@ final class CursorTracker {
     private var last = CGPoint(x: -1, y: -1)
 
     func start(frame: CGRect, t0: Double) {
-        let t = DispatchSource.makeTimerSource(queue: DispatchQueue(label: "recordy.cursor"))
+        let t = DispatchSource.makeTimerSource(queue: DispatchQueue(label: "record123.cursor"))
         t.schedule(deadline: .now(), repeating: .milliseconds(8))
         t.setEventHandler { [weak self] in
             guard let self else { return }
@@ -339,8 +339,8 @@ enum Devices {
 final class LevelMeter: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     private let session = AVCaptureSession()
     private let output = AVCaptureAudioDataOutput()
-    private let queue = DispatchQueue(label: "recordy.level")
-    private let sessionQueue = DispatchQueue(label: "recordy.level.session")
+    private let queue = DispatchQueue(label: "record123.level")
+    private let sessionQueue = DispatchQueue(label: "record123.level.session")
     var onLevel: ((Float) -> Void)?
 
     func start(device: AVCaptureDevice) throws {

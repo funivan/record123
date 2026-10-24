@@ -100,7 +100,7 @@ final class PermissionsModel: ObservableObject {
     }
 
     nonisolated static func resetAndRelaunch() {
-        let id = Bundle.main.bundleIdentifier ?? "com.funivan.recordy"
+        let id = Bundle.main.bundleIdentifier ?? "com.funivan.record123"
         let reset = Process()
         reset.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
         reset.arguments = ["reset", "All", id]
@@ -129,7 +129,7 @@ struct PermissionsSetupView: View {
         VStack(spacing: 18) {
             Image(systemName: "lock.shield").font(.system(size: 44, weight: .thin)).foregroundStyle(Theme.signal)
             Text("Allow access to get started").font(Theme.serif(22, italic: true))
-            Text("Recordy needs a few permissions from macOS before it can record.")
+            Text("Record123 needs a few permissions from macOS before it can record.")
                 .foregroundStyle(.secondary).multilineTextAlignment(.center)
             VStack(spacing: 10) {
                 ForEach(PermissionKind.allCases) { k in PermissionStepRow(model: model, kind: k) }
@@ -142,7 +142,7 @@ struct PermissionsSetupView: View {
                 VStack(spacing: 8) {
                     Text("Enabled Screen Recording in System Settings but it still shows as missing? macOS only applies it after the app restarts.")
                         .font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
-                    Button("Restart Recordy") { model.relaunch() }.buttonStyle(SoftButtonStyle())
+                    Button("Restart Record123") { model.relaunch() }.buttonStyle(SoftButtonStyle())
                 }
                 .frame(maxWidth: 440)
             }

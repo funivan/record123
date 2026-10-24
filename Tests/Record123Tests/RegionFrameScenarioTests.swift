@@ -1,5 +1,5 @@
 import Testing
-@testable import Recordy
+@testable import Record123
 
 /*
   Feature: The area frame shows only on the home screen

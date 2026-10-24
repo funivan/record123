@@ -29,6 +29,6 @@ git fetch -q --tags origin
 [[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/main)" ]] || { echo "main is not in sync with origin/main"; exit 1; }
 git rev-parse -q --verify "refs/tags/$TAG" >/dev/null && { echo "Tag $TAG already exists"; exit 1; }
 
-git tag -a "$TAG" -m "Recordy ${TAG#v}"
+git tag -a "$TAG" -m "Record123 ${TAG#v}"
 git push origin "$TAG"
-echo "Pushed $TAG: https://github.com/funivan/recordy/actions"
+echo "Pushed $TAG: https://github.com/funivan/record123/actions"

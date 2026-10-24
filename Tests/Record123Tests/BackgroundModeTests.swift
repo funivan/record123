@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-@testable import Recordy
+@testable import Record123
 
 /*
 Feature: The background is one choice of wallpaper, gradient or image

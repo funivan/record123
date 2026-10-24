@@ -1,6 +1,6 @@
 import Testing
 import CoreGraphics
-@testable import Recordy
+@testable import Record123
 
 /*
   Feature: The home screen starts with useful recording defaults
@@ -154,7 +154,7 @@ struct DeviceDefaultsTests {
 
     /*
       Scenario: A denied or restricted device is not selected
-        Given camera or microphone access is denied or restricted for Recordy
+        Given camera or microphone access is denied or restricted for Record123
         When the list of devices is refreshed
         Then "No camera" or "No microphone" is shown
     */

@@ -2,13 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "Recordy",
+    name: "Record123",
     platforms: [.macOS(.v14)],
     targets: [
         .executableTarget(
-            name: "Recordy",
-            path: "Sources/Recordy"
+            name: "Record123",
+            path: "Sources/Record123"
         ),
-        .testTarget(name: "RecordyTests", dependencies: ["Recordy"], path: "Tests/RecordyTests")
+        .testTarget(name: "Record123Tests", dependencies: ["Record123"], path: "Tests/Record123Tests")
     ]
 )

@@ -1,6 +1,6 @@
 import Testing
 import CoreGraphics
-@testable import Recordy
+@testable import Record123
 
 struct RegionFrameTests {
     static let phases: [RecPhase] = [.idle, .countdown(3), .countdown(0), .recording, .saving]

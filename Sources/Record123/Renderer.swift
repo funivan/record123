@@ -74,7 +74,7 @@ final class Compositor: NSObject, AVVideoCompositing {
          kCVPixelBufferMetalCompatibilityKey as String: true]
     }
 
-    private let queue = DispatchQueue(label: "recordy.compositor")
+    private let queue = DispatchQueue(label: "record123.compositor")
     private let ci = CIContext(options: [.workingColorSpace: CGColorSpace(name: CGColorSpace.sRGB)!,
                                          .outputColorSpace: CGColorSpace(name: CGColorSpace.sRGB)!])
     private let cs = CGColorSpace(name: CGColorSpace.sRGB)!
@@ -96,7 +96,7 @@ final class Compositor: NSObject, AVVideoCompositing {
         queue.async {
             guard let inst = request.videoCompositionInstruction as? CompositionInstruction,
                   let out = request.renderContext.newPixelBuffer() else {
-                request.finish(with: NSError(domain: "recordy", code: 1))
+                request.finish(with: NSError(domain: "record123", code: 1))
                 return
             }
             let screen = request.sourceFrame(byTrackID: inst.screenTrackID)
@@ -405,7 +405,7 @@ enum CompositionBuilder {
         }
 
         guard let screenID = try await insert(project.screenFile, offset: project.screenOffset, mediaType: .video) else {
-            throw NSError(domain: "recordy", code: 2, userInfo: [NSLocalizedDescriptionKey: "Screen track missing"])
+            throw NSError(domain: "record123", code: 2, userInfo: [NSLocalizedDescriptionKey: "Screen track missing"])
         }
         var cameraID: CMPersistentTrackID?
         if let f = project.cameraFile { cameraID = try? await insert(f, offset: project.cameraOffset, mediaType: .video) }
@@ -467,7 +467,7 @@ final class Exporter: ObservableObject {
             let state = RenderState(project: project, dir: dir)
             let built = try await CompositionBuilder.build(project: project, dir: dir, state: state)
             guard let session = AVAssetExportSession(asset: built.composition, presetName: AVAssetExportPresetHighestQuality) else {
-                throw NSError(domain: "recordy", code: 3, userInfo: [NSLocalizedDescriptionKey: "Cannot create export session"])
+                throw NSError(domain: "record123", code: 3, userInfo: [NSLocalizedDescriptionKey: "Cannot create export session"])
             }
             session.videoComposition = built.videoComposition
             session.audioMix = built.audioMix
@@ -484,7 +484,7 @@ final class Exporter: ObservableObject {
                 progress = 1
                 lastOutput = url
             } else {
-                throw session.error ?? NSError(domain: "recordy", code: 4, userInfo: [NSLocalizedDescriptionKey: "Export failed"])
+                throw session.error ?? NSError(domain: "record123", code: 4, userInfo: [NSLocalizedDescriptionKey: "Export failed"])
             }
         } catch {
             self.error = error.localizedDescription
