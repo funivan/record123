@@ -113,12 +113,11 @@ final class PermissionsModel: ObservableObject {
     func relaunch() { Self.relaunchApp() }
 
     nonisolated static func relaunchApp() {
-        let path = Bundle.main.bundlePath
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/bin/sh")
-        task.arguments = ["-c", "sleep 0.5; open \"\(path)\""]
-        try? task.run()
-        DispatchQueue.main.async { NSApp.terminate(nil) }
+        let config = NSWorkspace.OpenConfiguration()
+        config.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config) { _, _ in
+            DispatchQueue.main.async { NSApp.terminate(nil) }
+        }
     }
 }
 
