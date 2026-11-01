@@ -98,11 +98,7 @@ From a checkout of this repository, run as your normal user (not with `sudo`):
 This quits Record123, resets privacy permissions for the current and legacy bundle IDs,
 removes its login item and LaunchServices registration, and deletes
 `/Applications/Record123.app` along with its support files, preferences, caches and saved state.
-Recordings in `~/Movies/Record123` are kept by default. To permanently delete them too:
-
-```sh
-./scripts/uninstall.sh --with-recordings
-```
+Recordings in `~/Movies/Record123` are never deleted. The script prints their location so you can remove them yourself.
 
 Deletion is permanent, not a move to Trash. The script lists remaining matching files
 for inspection without deleting them. Check any reported errors (for example, if the app
@@ -142,10 +138,10 @@ Requires Xcode command line tools with Swift 5.9 or later.
 ```sh
 git clone git@github.com:funivan/record123.git
 cd record123
-./build.sh          # build Record123.app for the host architecture
-./build.sh --full   # build, quit the running app and relaunch it
-./build.sh --use-default       # also wipe saved settings, so the app starts with defaults
-./build.sh --reset-permission  # also reset Screen Recording, Camera and Microphone permissions
+./scripts/build.sh          # build Record123.app for the host architecture
+./scripts/build.sh --full   # build, quit the running app and relaunch it
+./scripts/build.sh --use-default       # also wipe saved settings, so the app starts with defaults
+./scripts/build.sh --reset-permission  # also reset Screen Recording, Camera and Microphone permissions
 ```
 
 Local builds are signed with a `Record123 Local Signing` identity when one exists in the keychain, otherwise ad-hoc. A stable identity keeps macOS privacy permissions across rebuilds.
@@ -158,15 +154,23 @@ Record123.app/Contents/MacOS/Record123 --export <project-dir> <output.mp4>
 
 Exports a saved project from `~/Movies/Record123` without opening the UI.
 
+## Scripts
+
+All shell scripts live in `scripts/` and can be run from any directory:
+
+- `scripts/build.sh`: builds, signs and packages the app (bash)
+- `scripts/release.sh`: tags and pushes a release (bash)
+- `scripts/uninstall.sh`: removes the app and its data, keeps recordings (bash)
+
+CI runs `shellcheck` on all of them for every pull request.
+
 ## Project layout
 
 - `Sources/Record123`: SwiftUI app (capture, editor, renderer, exporter)
 - `Resources`: app icon and bundled wallpapers
 - `tools`: scripts that generate the icon and wallpapers
 - `Casks`: Homebrew cask
-- `build.sh`: builds, signs and packages the app
-- `scripts/release.sh`: tags and pushes a release
-- `scripts/uninstall.sh`: removes the app and its data, optionally including recordings
+- `scripts`: shell scripts, see [Scripts](#scripts)
 
 ## Contributing and releasing
 

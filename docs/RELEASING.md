@@ -5,7 +5,7 @@ Releases are cut by pushing a version tag. CI does the rest.
 ```mermaid
 flowchart LR
     tag[scripts/release.sh X.Y.Z] --> ci[GitHub Actions]
-    ci --> build[build.sh --release]
+    ci --> build[scripts/build.sh --release]
     build --> rel[GitHub release zip]
     rel --> cask[Casks/record123.rb updated]
     cask --> brew[brew upgrade --cask record123]
@@ -24,7 +24,7 @@ The script requires a clean `main` that matches `origin/main`.
 
 The [Release workflow](../.github/workflows/release.yml) then:
 
-1. Builds a universal (arm64 + x86_64) app with `./build.sh --release`
+1. Builds a universal (arm64 + x86_64) app with `./scripts/build.sh --release`
 2. Publishes `Record123-<version>.zip` as a GitHub release
 3. Updates the version and checksum in [`Casks/record123.rb`](../Casks/record123.rb) on `main`
 
@@ -33,5 +33,5 @@ The [Release workflow](../.github/workflows/release.yml) then:
 Run locally with a Developer ID certificate:
 
 ```sh
-NOTARY_PROFILE=<profile> VERSION=1.0.0 ./build.sh --release
+NOTARY_PROFILE=<profile> VERSION=1.0.0 ./scripts/build.sh --release
 ```

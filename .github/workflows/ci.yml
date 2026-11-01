@@ -12,3 +12,10 @@ jobs:
       - uses: actions/checkout@v5
       - name: Test
         run: swift test
+
+  lint-shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: ShellCheck
+        run: shellcheck scripts/*.sh

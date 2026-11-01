@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 set -e
 cd "$(dirname "$0")/.."
 
@@ -6,12 +6,13 @@ usage() {
     echo "Usage: ./scripts/release.sh <TAG>    e.g. v1.2.0 or 1.2.0"
     echo
     git fetch -q --tags origin 2>/dev/null || true
-    local tags=$(git tag -l 'v*' --sort=-v:refname)
+    local tags
+    tags=$(git tag -l 'v*' --sort=-v:refname)
     if [[ -z "$tags" ]]; then
         echo "No versions released yet"
     else
         echo "Versions:"
-        echo "$tags" | sed 's/^/  /'
+        while IFS= read -r tag; do echo "  $tag"; done <<< "$tags"
     fi
 }
 
