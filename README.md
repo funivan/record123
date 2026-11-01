@@ -142,10 +142,10 @@ Requires Xcode command line tools with Swift 5.9 or later.
 ```sh
 git clone git@github.com:funivan/record123.git
 cd record123
-./build.sh          # build Record123.app for the host architecture
-./build.sh --full   # build, quit the running app and relaunch it
-./build.sh --use-default       # also wipe saved settings, so the app starts with defaults
-./build.sh --reset-permission  # also reset Screen Recording, Camera and Microphone permissions
+./scripts/build.sh          # build Record123.app for the host architecture
+./scripts/build.sh --full   # build, quit the running app and relaunch it
+./scripts/build.sh --use-default       # also wipe saved settings, so the app starts with defaults
+./scripts/build.sh --reset-permission  # also reset Screen Recording, Camera and Microphone permissions
 ```
 
 Local builds are signed with a `Record123 Local Signing` identity when one exists in the keychain, otherwise ad-hoc. A stable identity keeps macOS privacy permissions across rebuilds.
@@ -158,15 +158,23 @@ Record123.app/Contents/MacOS/Record123 --export <project-dir> <output.mp4>
 
 Exports a saved project from `~/Movies/Record123` without opening the UI.
 
+## Scripts
+
+All shell scripts live in `scripts/` and can be run from any directory:
+
+- `scripts/build.sh`: builds, signs and packages the app (zsh)
+- `scripts/release.sh`: tags and pushes a release (zsh)
+- `scripts/uninstall.sh`: removes the app and its data, optionally including recordings (bash)
+
+CI lints them on every pull request: `shellcheck` for bash scripts and `zsh -n` for zsh scripts.
+
 ## Project layout
 
 - `Sources/Record123`: SwiftUI app (capture, editor, renderer, exporter)
 - `Resources`: app icon and bundled wallpapers
 - `tools`: scripts that generate the icon and wallpapers
 - `Casks`: Homebrew cask
-- `build.sh`: builds, signs and packages the app
-- `scripts/release.sh`: tags and pushes a release
-- `scripts/uninstall.sh`: removes the app and its data, optionally including recordings
+- `scripts`: shell scripts, see [Scripts](#scripts)
 
 ## Contributing and releasing
 

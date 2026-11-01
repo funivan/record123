@@ -1,11 +1,11 @@
 #!/bin/zsh
 # Usage:
-#   ./build.sh            local build (host arch, local signing identity)
-#   ./build.sh --full     local build, quit running app, relaunch
-#   ./build.sh --release  universal build, Developer ID + hardened runtime, notarize, zip
-#   ./build.sh -h|--help  show this help
-#   ./build.sh --use-default       also wipe saved settings (devices, theme, style, area) so the app starts with defaults
-#   ./build.sh --reset-permission  also reset Screen Recording, Camera and Microphone permissions
+#   ./scripts/build.sh            local build (host arch, local signing identity)
+#   ./scripts/build.sh --full     local build, quit running app, relaunch
+#   ./scripts/build.sh --release  universal build, Developer ID + hardened runtime, notarize, zip
+#   ./scripts/build.sh -h|--help  show this help
+#   ./scripts/build.sh --use-default       also wipe saved settings (devices, theme, style, area) so the app starts with defaults
+#   ./scripts/build.sh --reset-permission  also reset Screen Recording, Camera and Microphone permissions
 #   The two flags combine with each other and with --full; either one quits and relaunches the app.
 #
 # Release env:
@@ -13,7 +13,7 @@
 #   NOTARY_PROFILE  notarytool keychain profile (xcrun notarytool store-credentials <name>)
 #   VERSION / BUILD CFBundleShortVersionString / CFBundleVersion
 set -e
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 FULL=0
 RELEASE=0
 USE_DEFAULT=0
