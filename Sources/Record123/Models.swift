@@ -457,12 +457,28 @@ struct ProjectRef: Identifiable, Hashable {
     }
 }
 
+enum ProjectError: Error {
+    case unsafeFileName
+}
+
+extension Project {
+    static func isSafeFileName(_ name: String) -> Bool {
+        !name.isEmpty && name != "." && name != ".." && URL(fileURLWithPath: name).lastPathComponent == name
+    }
+
+    var hasSafeFileNames: Bool {
+        let names = [screenFile, cameraFile, micFile, style.bgImageFile].compactMap { $0 } + (audioClips ?? []).map(\.file)
+        return names.allSatisfy(Project.isSafeFileName)
+    }
+}
+
 enum ProjectIO {
     static func load(_ dir: URL) throws -> Project {
         let data = try Data(contentsOf: Paths.projectFile(dir))
         let dec = JSONDecoder()
         dec.dateDecodingStrategy = .iso8601
         var p = try dec.decode(Project.self, from: data)
+        guard p.hasSafeFileNames else { throw ProjectError.unsafeFileName }
         p.migrateZoom()
         return p
     }
