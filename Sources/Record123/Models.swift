@@ -466,6 +466,13 @@ extension Project {
         !name.isEmpty && name != "." && name != ".." && URL(fileURLWithPath: name).lastPathComponent == name
     }
 
+    static let dimensionRange = 16...16384
+
+    mutating func clampDimensions() {
+        screenWidth = min(max(screenWidth, Project.dimensionRange.lowerBound), Project.dimensionRange.upperBound)
+        screenHeight = min(max(screenHeight, Project.dimensionRange.lowerBound), Project.dimensionRange.upperBound)
+    }
+
     var hasSafeFileNames: Bool {
         let names = [screenFile, cameraFile, micFile, style.bgImageFile].compactMap { $0 } + (audioClips ?? []).map(\.file)
         return names.allSatisfy(Project.isSafeFileName)
@@ -479,6 +486,7 @@ enum ProjectIO {
         dec.dateDecodingStrategy = .iso8601
         var p = try dec.decode(Project.self, from: data)
         guard p.hasSafeFileNames else { throw ProjectError.unsafeFileName }
+        p.clampDimensions()
         p.migrateZoom()
         return p
     }

@@ -43,4 +43,20 @@ struct ProjectFileNameTests {
         #expect(throws: ProjectError.self) { try load { $0.screenFile = "../x.mov" } }
         #expect(throws: ProjectError.self) { try load { $0.cameraFile = "sub/camera.mov" } }
     }
+
+    /*
+    Scenario: Absurd screen dimensions are clamped when a project opens
+      Given a project whose screen size is zero or enormous
+      When the project is opened
+      Then the screen size is limited to a sensible range
+    */
+    @Test("Absurd screen dimensions are clamped when a project opens")
+    func dimensionsClamped() throws {
+        let big = try load { $0.screenWidth = Int.max; $0.screenHeight = Int.max }
+        #expect(big.screenWidth == 16384 && big.screenHeight == 16384)
+        let small = try load { $0.screenWidth = 0; $0.screenHeight = -5 }
+        #expect(small.screenWidth == 16 && small.screenHeight == 16)
+        let normal = try load { _ in }
+        #expect(normal.screenWidth == 1920 && normal.screenHeight == 1080)
+    }
 }
