@@ -158,11 +158,11 @@ Exports a saved project from `~/Movies/Record123` without opening the UI.
 
 All shell scripts live in `scripts/` and can be run from any directory:
 
-- `scripts/build.sh`: builds, signs and packages the app (zsh)
-- `scripts/release.sh`: tags and pushes a release (zsh)
+- `scripts/build.sh`: builds, signs and packages the app (bash)
+- `scripts/release.sh`: tags and pushes a release (bash)
 - `scripts/uninstall.sh`: removes the app and its data, keeps recordings (bash)
 
-CI lints them on every pull request: `shellcheck` for bash scripts and `zsh -n` for zsh scripts.
+CI runs `shellcheck` on all of them for every pull request.
 
 ## Project layout
 

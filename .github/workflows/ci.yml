@@ -17,10 +17,5 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v5
-      - name: ShellCheck (bash)
-        run: shellcheck scripts/uninstall.sh
-      - name: Syntax check (zsh)
-        run: |
-          for script in scripts/build.sh scripts/release.sh; do
-            zsh -n "$script"
-          done
+      - name: ShellCheck
+        run: shellcheck scripts/*.sh

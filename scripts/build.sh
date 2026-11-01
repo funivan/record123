@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 # Usage:
 #   ./scripts/build.sh            local build (host arch, local signing identity)
 #   ./scripts/build.sh --full     local build, quit running app, relaunch
@@ -48,7 +48,7 @@ fi
 if (( RELEASE )); then
     swift build -c release --arch arm64 --arch x86_64
     BIN=$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/Record123
-    [[ "$(lipo -archs $BIN)" == *x86_64*arm64* || "$(lipo -archs $BIN)" == *arm64*x86_64* ]] || { echo "Not a universal binary: $BIN"; exit 1; }
+    [[ "$(lipo -archs "$BIN")" == *x86_64*arm64* || "$(lipo -archs "$BIN")" == *arm64*x86_64* ]] || { echo "Not a universal binary: $BIN"; exit 1; }
 else
     swift build -c release
     BIN=.build/release/Record123
@@ -57,7 +57,7 @@ fi
 APP=Record123.app
 rm -rf $APP
 mkdir -p $APP/Contents/MacOS $APP/Contents/Resources
-cp $BIN $APP/Contents/MacOS/Record123
+cp "$BIN" $APP/Contents/MacOS/Record123
 cp Resources/AppIcon.icns $APP/Contents/Resources/AppIcon.icns
 cp -R Resources/Wallpapers $APP/Contents/Resources/Wallpapers
 cat > $APP/Contents/Info.plist <<PLIST
@@ -96,13 +96,13 @@ if (( RELEASE )); then
     codesign "${SIGN_OPTS[@]}" -s "$SIGN_ID" $APP
     codesign --verify --strict --verbose=2 $APP
     ZIP=Record123-$VERSION.zip
-    rm -f $ZIP
-    ditto -c -k --keepParent $APP $ZIP
+    rm -f "$ZIP"
+    ditto -c -k --keepParent $APP "$ZIP"
     if [[ -n "$NOTARY_PROFILE" ]]; then
-        xcrun notarytool submit $ZIP --keychain-profile "$NOTARY_PROFILE" --wait
+        xcrun notarytool submit "$ZIP" --keychain-profile "$NOTARY_PROFILE" --wait
         xcrun stapler staple $APP
-        rm -f $ZIP
-        ditto -c -k --keepParent $APP $ZIP
+        rm -f "$ZIP"
+        ditto -c -k --keepParent $APP "$ZIP"
         spctl -a -vv -t exec $APP
     else
         echo "NOTARY_PROFILE not set: $ZIP is signed but not notarized"
