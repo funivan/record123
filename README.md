@@ -98,11 +98,7 @@ From a checkout of this repository, run as your normal user (not with `sudo`):
 This quits Record123, resets privacy permissions for the current and legacy bundle IDs,
 removes its login item and LaunchServices registration, and deletes
 `/Applications/Record123.app` along with its support files, preferences, caches and saved state.
-Recordings in `~/Movies/Record123` are kept by default. To permanently delete them too:
-
-```sh
-./scripts/uninstall.sh --with-recordings
-```
+Recordings in `~/Movies/Record123` are never deleted. The script prints their location so you can remove them yourself.
 
 Deletion is permanent, not a move to Trash. The script lists remaining matching files
 for inspection without deleting them. Check any reported errors (for example, if the app
@@ -164,7 +160,7 @@ All shell scripts live in `scripts/` and can be run from any directory:
 
 - `scripts/build.sh`: builds, signs and packages the app (zsh)
 - `scripts/release.sh`: tags and pushes a release (zsh)
-- `scripts/uninstall.sh`: removes the app and its data, optionally including recordings (bash)
+- `scripts/uninstall.sh`: removes the app and its data, keeps recordings (bash)
 
 CI lints them on every pull request: `shellcheck` for bash scripts and `zsh -n` for zsh scripts.
 

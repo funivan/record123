@@ -4,14 +4,12 @@ set -u
 BUNDLE_ID="com.funivan.record123"
 APP="/Applications/Record123.app"
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-DELETE_RECORDINGS=0
 
 for arg in "$@"; do
   case "$arg" in
-    --with-recordings) DELETE_RECORDINGS=1 ;;
     -h|--help)
-      echo "Usage: $0 [--with-recordings]"
-      echo "Removes Record123 and its settings. Recordings are kept unless --with-recordings is used."
+      echo "Usage: $0"
+      echo "Removes Record123 and its settings. Recordings in ~/Movies/Record123 are never deleted."
       exit 0
       ;;
     *) echo "Unknown option: $arg" >&2; exit 1 ;;
@@ -38,11 +36,7 @@ rm -rf "$HOME/Library/HTTPStorages/$BUNDLE_ID"
 rm -rf "$HOME/Library/WebKit/$BUNDLE_ID"
 killall cfprefsd 2>/dev/null
 
-if [[ "$DELETE_RECORDINGS" -eq 1 ]]; then
-  rm -rf "$HOME/Movies/Record123"
-else
-  echo "Kept recordings in ~/Movies/Record123 (use --with-recordings to delete)"
-fi
+echo "Recordings are kept in ~/Movies/Record123"
 
 echo "Remaining Record123 files:"
 find "$HOME/Library" /Library -iname "*record123*" 2>/dev/null
