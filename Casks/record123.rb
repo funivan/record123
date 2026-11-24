@@ -1,6 +1,6 @@
 cask "record123" do
-  version "0.1.0"
-  sha256 "6f4ea262015610bfefc5dce4a731723b61aaf8385781b1bb6af76719ebca955c"
+  version "0.1.1"
+  sha256 "ba5d883748efa8cdcb9ac9bee556d61b6c6741589da59e161124100ac173c70b"
 
   url "https://github.com/funivan/record123/releases/download/v#{version}/Record123-#{version}.zip"
   name "Record123"
